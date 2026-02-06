@@ -4,7 +4,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
-import com.hypixel.hytale.server.core.event.events.player.RemovePlayerFromWorldEvent;
+import com.hypixel.hytale.server.core.event.events.player.DrainPlayerFromWorldEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.waypointnav.plugin.api.WaypointAPI;
 import com.waypointnav.plugin.commands.WaypointCommand;
@@ -73,7 +73,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         LOGGER.atInfo().log("Initializing Waypoint Navigation Plugin...");
         
         // Initialize data folder
-        Path dataFolder = getDataFolder();
+        Path dataFolder = getDataDirectory();
         
         // Initialize managers
         this.waypointManager = new WaypointManager();
@@ -141,7 +141,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
             }
         });
 
-        this.getEventRegistry().registerGlobal(RemovePlayerFromWorldEvent.class, event -> {
+        this.getEventRegistry().registerGlobal(DrainPlayerFromWorldEvent.class, event -> {
             PlayerRef playerRef = event.getHolder().getComponent(PlayerRef.getComponentType());
             if (playerRef != null) {
                 quitListener.onPlayerQuit(playerRef);

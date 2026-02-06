@@ -5,7 +5,6 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.permission.GameMode;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -23,7 +22,6 @@ public class ToggleWorldCommand extends AbstractPlayerCommand {
     
     public ToggleWorldCommand() {
         super("toggle-world", "Toggle world markers on/off");
-        this.setPermissionGroup(GameMode.Adventure);
     }
     
     @Override

@@ -3,9 +3,8 @@ package com.waypointnav.plugin.commands.subcommands;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.math.Vec3d;
+import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.permission.GameMode;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -25,7 +24,6 @@ public class ListCommand extends AbstractPlayerCommand {
     
     public ListCommand() {
         super("list", "List all your waypoints");
-        this.setPermissionGroup(GameMode.Adventure);
     }
     
     @Override
@@ -48,8 +46,8 @@ public class ListCommand extends AbstractPlayerCommand {
         List<Waypoint> waypoints = playerData.getWaypoints();
         int activeIndex = playerData.getActiveWaypointIndex();
         
-        // Get player location from store
-        Vec3d position = store.getPosition(ref);
+        // Get player position from the player's transform
+        Vector3d position = new Vector3d(playerRef.getTransform().getPosition());
         
         playerRef.sendMessage(Message.raw(MessageUtils.header("Your Waypoints")));
         

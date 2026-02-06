@@ -33,6 +33,12 @@ public class NextCommand extends AbstractPlayerCommand {
                          PlayerRef playerRef,
                          World world) {
         
+        // Permission check
+        if (!playerRef.hasPermission("waypoint.admin")) {
+            playerRef.sendMessage(Message.raw(MessageUtils.error("You need the 'waypoint.admin' permission!")));
+            return;
+        }
+        
         WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
         UUID playerUuid = playerRef.getUuid();
         

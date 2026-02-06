@@ -77,8 +77,8 @@ public class ConfigManager {
         Map<String, Object> worldSettings = new HashMap<>();
         worldSettings.put("enabled", true);
         worldSettings.put("particleType", "FLAME");
-        worldSettings.put("particleCount", 10);
-        worldSettings.put("updateInterval", 20); // ticks
+        worldSettings.put("particleCount", 20);
+        worldSettings.put("updateInterval", 2); // ticks
         config.put("world", worldSettings);
         
         // Waypoint settings
@@ -91,6 +91,11 @@ public class ConfigManager {
         
         // Player scope settings
         config.put("playerScope", true); // true = per-player, false = global
+        
+        // Navigation settings
+        Map<String, Object> navSettings = new HashMap<>();
+        navSettings.put("alwaysEnabled", true);
+        config.put("navigation", navSettings);
         
         // Auto-save settings
         Map<String, Object> saveSettings = new HashMap<>();

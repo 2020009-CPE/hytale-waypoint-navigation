@@ -7,6 +7,9 @@ import java.util.*;
 /**
  * Stores waypoint navigation data for a specific player.
  * Tracks waypoint progress, active waypoint, and player-specific settings.
+ *
+ * Navigation is always enabled by default and uses priority-based targeting.
+ * The active waypoint is always the highest-priority (lowest number) incomplete waypoint.
  */
 public class PlayerWaypointData {
     private final UUID playerUuid;
@@ -14,7 +17,7 @@ public class PlayerWaypointData {
     private final Set<UUID> completedWaypoints;
     private int activeWaypointIndex;
     
-    // Player settings
+    // Player settings (navigation always on by default, config-only disable)
     private boolean navigationEnabled;
     private boolean hudEnabled;
     private boolean worldMarkersEnabled;
@@ -62,6 +65,7 @@ public class PlayerWaypointData {
     public void addWaypoint(Waypoint waypoint) {
         waypoint.setOrder(waypoints.size());
         waypoints.add(waypoint);
+        recalculateActiveWaypoint();
     }
     
     /**
@@ -78,10 +82,7 @@ public class PlayerWaypointData {
             for (int i = 0; i < waypoints.size(); i++) {
                 waypoints.get(i).setOrder(i);
             }
-            // Adjust active index if needed
-            if (activeWaypointIndex >= waypoints.size() && !waypoints.isEmpty()) {
-                activeWaypointIndex = waypoints.size() - 1;
-            }
+            recalculateActiveWaypoint();
         }
         return removed;
     }
@@ -96,7 +97,33 @@ public class PlayerWaypointData {
     }
     
     /**
+     * Recalculates the active waypoint based on priority.
+     * Selects the highest-priority (lowest number) incomplete waypoint.
+     * If all waypoints are completed, sets index past the end.
+     */
+    public void recalculateActiveWaypoint() {
+        int bestIndex = -1;
+        int bestPriority = Integer.MAX_VALUE;
+        
+        for (int i = 0; i < waypoints.size(); i++) {
+            Waypoint wp = waypoints.get(i);
+            if (!wp.isCompleted() && wp.getPriority() < bestPriority) {
+                bestPriority = wp.getPriority();
+                bestIndex = i;
+            }
+        }
+        
+        if (bestIndex >= 0) {
+            activeWaypointIndex = bestIndex;
+        } else {
+            // All completed or no waypoints
+            activeWaypointIndex = waypoints.size();
+        }
+    }
+    
+    /**
      * Gets the currently active waypoint.
+     * Returns the highest-priority incomplete waypoint.
      *
      * @return The active waypoint, or null if none
      */
@@ -123,22 +150,19 @@ public class PlayerWaypointData {
      * @param index The index to set
      */
     public void setActiveWaypointIndex(int index) {
-        if (index >= 0 && index < waypoints.size()) {
+        if (index >= 0 && index <= waypoints.size()) {
             this.activeWaypointIndex = index;
         }
     }
     
     /**
-     * Advances to the next waypoint.
+     * Advances to the next incomplete waypoint by priority.
      *
-     * @return true if advanced, false if already at last waypoint
+     * @return true if advanced, false if no more incomplete waypoints
      */
     public boolean nextWaypoint() {
-        if (activeWaypointIndex < waypoints.size() - 1) {
-            activeWaypointIndex++;
-            return true;
-        }
-        return false;
+        recalculateActiveWaypoint();
+        return activeWaypointIndex < waypoints.size();
     }
     
     /**
@@ -154,6 +178,8 @@ public class PlayerWaypointData {
             .filter(wp -> wp.getId().equals(waypointId))
             .findFirst()
             .ifPresent(wp -> wp.setCompleted(true));
+        
+        recalculateActiveWaypoint();
     }
     
     /**
@@ -177,7 +203,7 @@ public class PlayerWaypointData {
     }
     
     /**
-     * Skips the current waypoint and advances to the next.
+     * Skips the current waypoint (marks completed) and advances to the next by priority.
      *
      * @return true if skipped successfully
      */
@@ -191,7 +217,7 @@ public class PlayerWaypointData {
             completeWaypoint(current.getId());
         }
         
-        return nextWaypoint();
+        return getActiveWaypoint() != null;
     }
     
     /**
@@ -202,7 +228,7 @@ public class PlayerWaypointData {
             completeWaypoint(wp.getId());
             wp.setCompleted(true);
         });
-        activeWaypointIndex = waypoints.size() - 1;
+        activeWaypointIndex = waypoints.size();
     }
     
     // Settings getters and setters

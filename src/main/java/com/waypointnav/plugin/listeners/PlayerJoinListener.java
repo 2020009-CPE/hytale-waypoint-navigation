@@ -27,6 +27,8 @@ public class PlayerJoinListener {
         UUID playerUuid = playerRef.getUuid();
         LOGGER.atInfo().log("Player %s joined. Loading waypoint data...", playerUuid);
         
+        boolean alwaysEnabled = plugin.getConfigManager().getBoolean("navigation.alwaysEnabled", true);
+        
         // Load player data asynchronously
         plugin.getStorage().loadPlayerDataAsync(playerUuid).thenAccept(data -> {
             if (data != null) {
@@ -39,13 +41,22 @@ public class PlayerJoinListener {
                     // Merge loaded waypoints
                     data.getWaypoints().forEach(playerData::addWaypoint);
                     playerData.setActiveWaypointIndex(data.getActiveWaypointIndex());
-                    playerData.setNavigationEnabled(data.isNavigationEnabled());
                     playerData.setHudEnabled(data.isHudEnabled());
                     playerData.setWorldMarkersEnabled(data.isWorldMarkersEnabled());
+                    
+                    // Force navigation enabled if config says always-on
+                    if (alwaysEnabled) {
+                        playerData.setNavigationEnabled(true);
+                    } else {
+                        playerData.setNavigationEnabled(data.isNavigationEnabled());
+                    }
+                    
+                    // Recalculate active waypoint based on priority
+                    playerData.recalculateActiveWaypoint();
                 }
             } else {
                 LOGGER.atInfo().log("No saved data found for player %s. Creating new profile.", playerUuid);
-                // Create new player data
+                // Create new player data (navigation is enabled by default)
                 plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
             }
         });

@@ -8,14 +8,17 @@
   "world": {
     "enabled": true,
     "particleType": "FLAME",
-    "particleCount": 10,
-    "updateInterval": 20
+    "particleCount": 20,
+    "updateInterval": 2
   },
   "waypoint": {
     "defaultRadius": 5.0,
     "autoProgress": true,
     "playSound": true,
     "maxWaypoints": 50
+  },
+  "navigation": {
+    "alwaysEnabled": true
   },
   "playerScope": true,
   "autoSave": {

@@ -70,52 +70,52 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
      */
     @Override
     protected void setup() {
-        LOGGER.atInfo().log("Initializing Waypoint Navigation Plugin...");
+        LOGGER.info("Initializing Waypoint Navigation Plugin...");
         
         // Initialize data folder
         Path dataFolder = getDataDirectory();
-        LOGGER.atInfo().log("Data directory: %s", dataFolder);
+        LOGGER.info("Data directory: %s", dataFolder);
         
         // Initialize managers
         this.waypointManager = new WaypointManager();
         this.playerDataManager = new PlayerDataManager();
         this.storage = new WaypointStorage(dataFolder);
         this.configManager = new ConfigManager(dataFolder);
-        LOGGER.atInfo().log("Managers initialized.");
+        LOGGER.info("Managers initialized.");
         
         // Initialize renderers
         this.hudRenderer = new HUDRenderer();
         this.worldRenderer = new WorldRenderer();
-        LOGGER.atInfo().log("Renderers initialized (HUD + World markers).");
+        LOGGER.info("Renderers initialized (HUD + World markers).");
         
         // Load configuration
         configManager.load();
-        LOGGER.atInfo().log("Configuration loaded.");
+        LOGGER.info("Configuration loaded.");
         
         // Initialize storage
         storage.initialize();
-        LOGGER.atInfo().log("Storage system initialized.");
+        LOGGER.info("Storage system initialized.");
         
         // Register commands
         registerCommands();
-        LOGGER.atInfo().log("Commands registered (including /waypoint help).");
+        LOGGER.info("Commands registered (including /waypoint help).");
         
         // Register event listeners
         registerListeners();
-        LOGGER.atInfo().log("Event listeners registered.");
+        LOGGER.info("Event listeners registered.");
         
         // Start update tasks
         startUpdateTasks();
-        LOGGER.atInfo().log("Update tasks started.");
+        LOGGER.info("Update tasks started.");
         
-        LOGGER.atInfo().log("Waypoint Navigation Plugin enabled!");
+        LOGGER.info("Waypoint Navigation Plugin enabled!");
     }
     
     /**
      * Plugin shutdown method called during disable.
      */
     public void onDisable() {
-        LOGGER.atInfo().log("Disabling Waypoint Navigation Plugin...");
+        LOGGER.info("Disabling Waypoint Navigation Plugin...");
         
         // Save all player data
         saveAllPlayerData();
@@ -123,7 +123,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         // Save configuration
         configManager.save();
         
-        LOGGER.atInfo().log("Waypoint Navigation Plugin disabled!");
+        LOGGER.info("Waypoint Navigation Plugin disabled!");
     }
     
     /**
@@ -164,14 +164,14 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         // Note: Specific scheduler API not yet documented
         // This would use Hytale's World.execute() or scheduler system for periodic tasks
         // to update HUD rendering, world markers, and perform auto-saves
-        LOGGER.atInfo().log("Periodic update tasks not yet started - awaiting Hytale scheduler API.");
+        LOGGER.info("Periodic update tasks not yet started - awaiting Hytale scheduler API.");
     }
     
     /**
      * Saves all player data asynchronously.
      */
     private void saveAllPlayerData() {
-        LOGGER.atInfo().log("Saving all player data on shutdown...");
+        LOGGER.info("Saving all player data on shutdown...");
         // Note: Would iterate through online players using Hytale's player manager
         // and save their waypoint data
     }

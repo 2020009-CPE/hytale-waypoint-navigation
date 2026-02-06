@@ -6,16 +6,9 @@ public class HytaleLogger {
         return new HytaleLogger();
     }
 
-    public LogEntry atInfo() {
-        return new LogEntry();
+    public void info(String message, Object... args) {
     }
 
-    public LogEntry atFine() {
-        return new LogEntry();
-    }
-
-    public static class LogEntry {
-        public void log(String message, Object... args) {
-        }
+    public void fine(String message, Object... args) {
     }
 }

@@ -66,7 +66,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
             @Nonnull UIEventBuilder evt,
             @Nonnull Store<EntityStore> store
     ) {
-        LOGGER.atInfo().log("Building waypoint UI for player %s", playerRef.getUuid());
+        LOGGER.info("Building waypoint UI for player %s", playerRef.getUuid());
 
         // Load the main panel layout
         cmd.append(LAYOUT);
@@ -184,13 +184,13 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
 
         String action = data.action != null ? data.action : "";
 
-        LOGGER.atInfo().log("Waypoint UI event: action=%s, name=%s",
+        LOGGER.info("Waypoint UI event: action=%s, name=%s",
             data.action, data.wpName);
 
         if (action.startsWith(REMOVE_ACTION_PREFIX)) {
             int index = parseIntSafe(action.substring(REMOVE_ACTION_PREFIX.length()), -1);
             if (index < 0) {
-                LOGGER.atInfo().log("Invalid remove waypoint index in action: %s", action);
+                LOGGER.info("Invalid remove waypoint index in action: %s", action);
                 sendUpdate();
                 return;
             }
@@ -217,7 +217,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
                 return;
 
             default:
-                LOGGER.atInfo().log("Unknown UI action: %s", data.action);
+                LOGGER.info("Unknown UI action: %s", data.action);
                 return;
         }
 

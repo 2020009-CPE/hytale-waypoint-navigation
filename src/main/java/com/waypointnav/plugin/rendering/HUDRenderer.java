@@ -30,13 +30,13 @@ public class HUDRenderer {
                       float playerYaw, float playerPitch) {
         
         if (!playerData.isHudEnabled()) {
-            LOGGER.atFine().log("[DEBUG] HUD disabled for player, skipping render.");
+            LOGGER.fine("[DEBUG] HUD disabled for player, skipping render.");
             return;
         }
         
         Waypoint active = playerData.getActiveWaypoint();
         if (active == null) {
-            LOGGER.atFine().log("[DEBUG] No active waypoint for player, skipping HUD render.");
+            LOGGER.fine("[DEBUG] No active waypoint for player, skipping HUD render.");
             return;
         }
         
@@ -76,7 +76,7 @@ public class HUDRenderer {
         // Draw arrow texture rotated to point in correct direction
         // Scale arrow based on how far off-screen the waypoint is
         // Use different colors/styles based on distance
-        LOGGER.atFine().log("[DEBUG] HUD arrow render requested: yawDiff=%.2f, pitchDiff=%.2f - awaiting Hytale HUD API",
+        LOGGER.fine("[DEBUG] HUD arrow render requested: yawDiff=%.2f, pitchDiff=%.2f - awaiting Hytale HUD API",
             yawDiff, pitchDiff);
     }
     
@@ -94,7 +94,7 @@ public class HUDRenderer {
         // Display formatted distance below name
         // Use color coding based on distance
         // Position text below the arrow
-        LOGGER.atFine().log("[DEBUG] HUD text render requested: waypoint='%s', distance=%s - awaiting Hytale HUD API",
+        LOGGER.fine("[DEBUG] HUD text render requested: waypoint='%s', distance=%s - awaiting Hytale HUD API",
             name, distanceStr);
     }
     
@@ -120,6 +120,6 @@ public class HUDRenderer {
      * Clears the HUD display.
      */
     public void clear() {
-        LOGGER.atFine().log("[DEBUG] Clearing HUD display elements.");
+        LOGGER.fine("[DEBUG] Clearing HUD display elements.");
     }
 }

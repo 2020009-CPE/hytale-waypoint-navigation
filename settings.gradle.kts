@@ -17,3 +17,5 @@ plugins {
 }
 
 rootProject.name = "waypoint-navigation"
+
+include("hytale-api-stubs")

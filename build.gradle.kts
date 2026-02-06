@@ -8,14 +8,11 @@ version = project.property("version") as String
 
 repositories {
     mavenCentral()
-    maven("https://maven.hytale.com/release") {
-        name = "HytaleRelease"
-    }
 }
 
 dependencies {
     // Hytale API (provided by the server at runtime)
-    compileOnly("com.hypixel.hytale:Server:+")
+    compileOnly(project(":hytale-api-stubs"))
 
     // JSON processing (shaded into the JAR)
     implementation("com.google.code.gson:gson:2.10.1")

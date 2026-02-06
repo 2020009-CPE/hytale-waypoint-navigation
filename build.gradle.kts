@@ -36,9 +36,11 @@ tasks {
         archiveClassifier.set("")
         archiveBaseName.set("WaypointNavigation")
         
-        // Include Hytale API stubs in the JAR until the official API is released.
+        // Exclude Hytale API stubs from the JAR - these are compile-only placeholders.
+        // The real classes are provided by the Hytale server at runtime.
         // When the official Hytale API is available, the stubs can be removed and
         // the compileOnly dependency uncommented above.
+        exclude("com/hypixel/**")
         
         // Relocate dependencies to avoid conflicts
         relocate("com.google.gson", "com.waypointnav.libs.gson")

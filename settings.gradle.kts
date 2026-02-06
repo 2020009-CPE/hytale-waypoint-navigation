@@ -8,9 +8,6 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
-        maven("https://maven.hytale-mods.dev/releases") {
-            name = "HytaleModdingReleases"
-        }
     }
 }
 

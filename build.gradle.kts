@@ -1,6 +1,5 @@
 plugins {
     id("java-library")
-    id("hytale-mod") version "0.+"
     id("com.gradleup.shadow") version "9.3.1"
 }
 
@@ -9,12 +8,15 @@ version = project.property("version") as String
 
 repositories {
     mavenCentral()
-    maven("https://maven.hytale-mods.dev/releases") {
-        name = "HytaleModdingReleases"
+    maven("https://maven.hytale.com/release") {
+        name = "HytaleRelease"
     }
 }
 
 dependencies {
+    // Hytale API (provided by the server at runtime)
+    compileOnly("com.hypixel.hytale:Server:+")
+
     // JSON processing (shaded into the JAR)
     implementation("com.google.code.gson:gson:2.10.1")
 

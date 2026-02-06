@@ -209,7 +209,7 @@ src/main/java/com/waypointnav/plugin/
 
 ## Development Notes
 
-This plugin is built against the official Hytale modding API using the `hytale-mod` Gradle plugin. The Hytale API is provided at compile time by the plugin and available at runtime on the server.
+This plugin compiles against the official Hytale Server API published to `maven.hytale.com`. No stub classes are needed — the API is fetched automatically by Gradle at build time and provided by the Hytale server at runtime. For more information on Hytale modding, see the [community documentation](https://github.com/HytaleModding/site).
 
 ## Contributing
 

@@ -39,13 +39,13 @@ public class WorldRenderer {
         tickCounter++;
 
         if (!playerData.isWorldMarkersEnabled()) {
-            LOGGER.atFine().log("[DEBUG] World markers disabled for player, skipping render.");
+            LOGGER.fine("[DEBUG] World markers disabled for player, skipping render.");
             return;
         }
 
         Waypoint active = playerData.getActiveWaypoint();
         if (active == null) {
-            LOGGER.atFine().log("[DEBUG] No active waypoint for player, skipping world marker render.");
+            LOGGER.fine("[DEBUG] No active waypoint for player, skipping world marker render.");
             return;
         }
 
@@ -69,12 +69,12 @@ public class WorldRenderer {
 
         // Don't render if too far away (performance optimization)
         if (distance > MAX_RENDER_DISTANCE) {
-            LOGGER.atFine().log("[DEBUG] Waypoint '%s' is %.1f blocks away (>%.0f), skipping world marker.",
+            LOGGER.fine("[DEBUG] Waypoint '%s' is %.1f blocks away (>%.0f), skipping world marker.",
                 waypoint.getName(), distance, MAX_RENDER_DISTANCE);
             return;
         }
 
-        LOGGER.atFine().log("[DEBUG] Rendering world marker for waypoint '%s' at (%.1f, %.1f, %.1f), distance: %.1f",
+        LOGGER.fine("[DEBUG] Rendering world marker for waypoint '%s' at (%.1f, %.1f, %.1f), distance: %.1f",
             waypoint.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ(), distance);
 
         // Calculate direction vector from player eye level to waypoint
@@ -168,7 +168,7 @@ public class WorldRenderer {
     private void spawnParticle(double x, double y, double z, String particleType) {
         // TODO: Use Hytale's particle system when API is available:
         // world.spawnParticle(particleType, x, y, z, count, offsetX, offsetY, offsetZ, speed);
-        LOGGER.atFine().log("[DEBUG] Particle spawn requested: type=%s at (%.2f, %.2f, %.2f) - awaiting Hytale particle API",
+        LOGGER.fine("[DEBUG] Particle spawn requested: type=%s at (%.2f, %.2f, %.2f) - awaiting Hytale particle API",
             particleType, x, y, z);
     }
 
@@ -192,7 +192,7 @@ public class WorldRenderer {
      * Clears all world markers.
      */
     public void clear() {
-        LOGGER.atFine().log("[DEBUG] Clearing all world markers, resetting tick counter.");
+        LOGGER.fine("[DEBUG] Clearing all world markers, resetting tick counter.");
         tickCounter = 0;
     }
 }

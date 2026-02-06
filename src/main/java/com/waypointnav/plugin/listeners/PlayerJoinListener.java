@@ -25,14 +25,14 @@ public class PlayerJoinListener {
      */
     public void onPlayerJoin(PlayerRef playerRef) {
         UUID playerUuid = playerRef.getUuid();
-        LOGGER.atInfo().log("Player %s joined. Loading waypoint data...", playerUuid);
+        LOGGER.info("Player %s joined. Loading waypoint data...", playerUuid);
         
         boolean alwaysEnabled = plugin.getConfigManager().getBoolean("navigation.alwaysEnabled", true);
         
         // Load player data asynchronously
         plugin.getStorage().loadPlayerDataAsync(playerUuid).thenAccept(data -> {
             if (data != null) {
-                LOGGER.atInfo().log("Loaded %d waypoint(s) for player %s.",
+                LOGGER.info("Loaded %d waypoint(s) for player %s.",
                     data.getWaypoints().size(), playerUuid);
                 plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
                 // Copy loaded data into player data manager
@@ -55,7 +55,7 @@ public class PlayerJoinListener {
                     playerData.recalculateActiveWaypoint();
                 }
             } else {
-                LOGGER.atInfo().log("No saved data found for player %s. Creating new profile.", playerUuid);
+                LOGGER.info("No saved data found for player %s. Creating new profile.", playerUuid);
                 // Create new player data (navigation is enabled by default)
                 plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
             }

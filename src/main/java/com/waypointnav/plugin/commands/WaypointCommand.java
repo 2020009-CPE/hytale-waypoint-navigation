@@ -22,5 +22,6 @@ public class WaypointCommand extends AbstractCommandCollection {
         addSubCommand(new ToggleCommand());
         addSubCommand(new ToggleHudCommand());
         addSubCommand(new ToggleWorldCommand());
+        addSubCommand(new HelpCommand());
     }
 }

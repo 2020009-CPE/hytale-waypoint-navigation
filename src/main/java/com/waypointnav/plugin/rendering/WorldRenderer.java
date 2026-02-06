@@ -1,5 +1,6 @@
 package com.waypointnav.plugin.rendering;
 
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MathUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
@@ -12,6 +13,7 @@ import com.waypointnav.plugin.waypoint.Waypoint;
  * particle system when available.
  */
 public class WorldRenderer {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     private int tickCounter = 0;
     
     /**
@@ -28,11 +30,13 @@ public class WorldRenderer {
         tickCounter++;
         
         if (!playerData.isWorldMarkersEnabled()) {
+            LOGGER.atFine().log("[DEBUG] World markers disabled for player, skipping render.");
             return;
         }
         
         Waypoint active = playerData.getActiveWaypoint();
         if (active == null) {
+            LOGGER.atFine().log("[DEBUG] No active waypoint for player, skipping world marker render.");
             return;
         }
         
@@ -57,8 +61,13 @@ public class WorldRenderer {
         
         // Don't render if too far away (performance optimization)
         if (distance > 500) {
+            LOGGER.atFine().log("[DEBUG] Waypoint '%s' is %.1f blocks away (>500), skipping world marker.",
+                waypoint.getName(), distance);
             return;
         }
+        
+        LOGGER.atFine().log("[DEBUG] Rendering world marker for waypoint '%s' at (%.1f, %.1f, %.1f), distance: %.1f",
+            waypoint.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ(), distance);
         
         // Calculate direction vector
         double[] direction = MathUtils.directionVector(
@@ -155,8 +164,10 @@ public class WorldRenderer {
      * @param particleType Type of particle to spawn
      */
     private void spawnParticle(double x, double y, double z, String particleType) {
-        // Use Hytale's particle system:
+        // TODO: Use Hytale's particle system when API is available:
         // world.spawnParticle(particleType, x, y, z, count, offsetX, offsetY, offsetZ, speed);
+        LOGGER.atFine().log("[DEBUG] Particle spawn requested: type=%s at (%.2f, %.2f, %.2f) - awaiting Hytale particle API",
+            particleType, x, y, z);
     }
     
     /**
@@ -180,7 +191,7 @@ public class WorldRenderer {
      * Clears all world markers.
      */
     public void clear() {
-        // Particles naturally despawn, so nothing to clear
+        LOGGER.atInfo().log("[DEBUG] Clearing all world markers, resetting tick counter.");
         tickCounter = 0;
     }
 }

@@ -1,5 +1,6 @@
 package com.waypointnav.plugin.rendering;
 
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MathUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
@@ -12,6 +13,7 @@ import com.waypointnav.plugin.waypoint.Waypoint;
  * client-side rendering system when available.
  */
 public class HUDRenderer {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     
     /**
      * Renders the HUD for a player.
@@ -28,11 +30,13 @@ public class HUDRenderer {
                       float playerYaw, float playerPitch) {
         
         if (!playerData.isHudEnabled()) {
+            LOGGER.atFine().log("[DEBUG] HUD disabled for player, skipping render.");
             return;
         }
         
         Waypoint active = playerData.getActiveWaypoint();
         if (active == null) {
+            LOGGER.atFine().log("[DEBUG] No active waypoint for player, skipping HUD render.");
             return;
         }
         
@@ -67,10 +71,13 @@ public class HUDRenderer {
      * @param pitchDiff The pitch difference in degrees
      */
     private void renderArrow(double yawDiff, double pitchDiff) {
+        // TODO: Integrate with Hytale's client-side rendering API when available
         // Calculate screen position based on yawDiff and pitchDiff
         // Draw arrow texture rotated to point in correct direction
         // Scale arrow based on how far off-screen the waypoint is
         // Use different colors/styles based on distance
+        LOGGER.atFine().log("[DEBUG] HUD arrow render requested: yawDiff=%.2f, pitchDiff=%.2f - awaiting Hytale HUD API",
+            yawDiff, pitchDiff);
     }
     
     /**
@@ -82,10 +89,13 @@ public class HUDRenderer {
      */
     private void renderDistanceText(double distance, String name) {
         String distanceStr = MathUtils.formatDistance(distance);
+        // TODO: Integrate with Hytale's text rendering API when available
         // Display waypoint name at top
         // Display formatted distance below name
         // Use color coding based on distance
         // Position text below the arrow
+        LOGGER.atFine().log("[DEBUG] HUD text render requested: waypoint='%s', distance=%s - awaiting Hytale HUD API",
+            name, distanceStr);
     }
     
     /**
@@ -110,6 +120,6 @@ public class HUDRenderer {
      * Clears the HUD display.
      */
     public void clear() {
-        // Clear any rendered HUD elements using Hytale's rendering API
+        LOGGER.atInfo().log("[DEBUG] Clearing HUD display elements.");
     }
 }

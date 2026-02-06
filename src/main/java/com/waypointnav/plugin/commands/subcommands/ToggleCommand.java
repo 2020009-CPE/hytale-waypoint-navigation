@@ -42,7 +42,7 @@ public class ToggleCommand extends AbstractPlayerCommand {
         // Save
         plugin.getStorage().savePlayerDataAsync(playerData);
         
-        String status = newState ? "§aenabled" : "§cdisabled";
+        String status = newState ? "enabled" : "disabled";
         playerRef.sendMessage(Message.raw(MessageUtils.success("Waypoint navigation " + status + "!")));
     }
 }

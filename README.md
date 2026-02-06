@@ -31,6 +31,40 @@ A comprehensive waypoint navigation system for Hytale that provides players with
 - **Developer-Friendly**: Other plugins can integrate with the waypoint system
 - **Complete Control**: Create, modify, and query waypoints programmatically
 
+## Quick Start Tutorial
+
+Follow these steps to start using waypoint navigation:
+
+**Step 1:** Create your first waypoint at your current location:
+```
+/waypoint add "Town Square" 10
+```
+This saves your position with a 10-block collection radius.
+
+**Step 2:** Walk to another location and add more waypoints:
+```
+/waypoint add "Forest Camp"
+/waypoint add "Mountain Peak" 15
+```
+
+**Step 3:** View all your waypoints and see distances:
+```
+/waypoint list
+```
+
+**Step 4:** Navigate! Follow the HUD arrow and world markers toward each waypoint. When you walk within the collection radius, the waypoint auto-completes and the system advances to the next one.
+
+**Step 5:** Control your experience:
+```
+/waypoint next         # Switch to next waypoint manually
+/waypoint skip         # Skip current waypoint
+/waypoint toggle       # Turn navigation on/off
+/waypoint toggle-hud   # Toggle the HUD arrow
+/waypoint toggle-world # Toggle 3D world markers
+```
+
+**Need help in-game?** Run `/waypoint help` for the full guide.
+
 ## Commands
 
 All commands use the `/waypoint` (or `/wp`) prefix:
@@ -47,6 +81,7 @@ All commands use the `/waypoint` (or `/wp`) prefix:
 | `/waypoint toggle` | Toggle navigation on/off | `/waypoint toggle` |
 | `/waypoint toggle-hud` | Toggle HUD display | `/waypoint toggle-hud` |
 | `/waypoint toggle-world` | Toggle world markers | `/waypoint toggle-world` |
+| `/waypoint help` | Show step-by-step usage guide | `/waypoint help` |
 
 ## Installation
 
@@ -210,6 +245,21 @@ src/main/java/com/waypointnav/plugin/
 ## Development Notes
 
 This plugin compiles against the official Hytale Server API published to `maven.hytale.com`. No stub classes are needed — the API is fetched automatically by Gradle at build time and provided by the Hytale server at runtime. For more information on Hytale modding, see the [community documentation](https://github.com/HytaleModding/site).
+
+### Text Formatting
+
+Hytale does not support Minecraft-style color codes (`§` section-sign codes or `&` ampersand codes). All chat messages use plain text. When Hytale's native text styling API becomes available, the formatting constants in `MessageUtils.java` can be updated.
+
+### Debug Logging
+
+The plugin includes debug log messages throughout the rendering pipeline, player listeners, and plugin lifecycle. These messages appear in the server console and help diagnose issues such as:
+
+- Particles not appearing (check for `[DEBUG] Particle spawn requested` messages)
+- HUD not rendering (check for `[DEBUG] HUD disabled` or `[DEBUG] No active waypoint` messages)
+- Player data not loading/saving (check for `[DEBUG] Player ... joined` messages)
+- Waypoint completion not triggering (check for `[DEBUG] Player ... reached waypoint` messages)
+
+Debug messages use Hytale's `HytaleLogger` system. Fine-level messages (`atFine`) are only shown when the logging level is set to FINE or lower.
 
 ## Contributing
 

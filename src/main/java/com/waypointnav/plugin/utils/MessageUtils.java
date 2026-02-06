@@ -1,17 +1,21 @@
 package com.waypointnav.plugin.utils;
 /**
  * Utility class for creating formatted messages and chat output.
+ *
+ * Note: Hytale does not support Minecraft-style color codes (§ or &amp; prefixes).
+ * All messages use plain text formatting. When Hytale's text styling API becomes
+ * available, these constants can be updated to use the native formatting system.
  */
 public class MessageUtils {
     
-    // Color codes (using standard Minecraft color codes)
-    public static final String PREFIX = "§6[§eWaypoint§6]§r ";
-    public static final String ERROR = "§c";
-    public static final String SUCCESS = "§a";
-    public static final String INFO = "§b";
-    public static final String WARNING = "§e";
-    public static final String HIGHLIGHT = "§6";
-    public static final String RESET = "§r";
+    // Plain text prefixes (Hytale does not support § or & color codes)
+    public static final String PREFIX = "[Waypoint] ";
+    public static final String ERROR = "[ERROR] ";
+    public static final String SUCCESS = "";
+    public static final String INFO = "";
+    public static final String WARNING = "[!] ";
+    public static final String HIGHLIGHT = "";
+    public static final String RESET = "";
     
     /**
      * Creates an error message.
@@ -89,7 +93,7 @@ public class MessageUtils {
      */
 
     public static String formatCoordinates(double x, double y, double z) {
-        return String.format("§e%.1f§7, §e%.1f§7, §e%.1f", x, y, z);
+        return String.format("%.1f, %.1f, %.1f", x, y, z);
     }
     
     /**
@@ -112,7 +116,7 @@ public class MessageUtils {
      */
 
     public static String listItem(int index, String content) {
-        return INFO + (index + 1) + "§7. " + RESET + content;
+        return (index + 1) + ". " + content;
     }
     
     /**
@@ -135,7 +139,7 @@ public class MessageUtils {
         String coords = formatCoordinates(x, y, z);
         String dist = MathUtils.formatDistance(distance);
         
-        return String.format("%s §7%d. %s%s §7[%s] §8(%s)", 
-            status, index + 1, RESET, name, coords, dist);
+        return String.format("%s %d. %s [%s] (%s)", 
+            status, index + 1, name, coords, dist);
     }
 }

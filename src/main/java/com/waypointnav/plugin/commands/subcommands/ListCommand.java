@@ -55,7 +55,7 @@ public class ListCommand extends AbstractPlayerCommand {
             Waypoint wp = waypoints.get(i);
             double distance = wp.distanceFrom(position.getX(), position.getY(), position.getZ());
             
-            String marker = (i == activeIndex) ? "§a→ " : "  ";
+            String marker = (i == activeIndex) ? "> " : "  ";
             String message = MessageUtils.formatWaypointList(
                 i, wp.getName(), 
                 wp.getX(), wp.getY(), wp.getZ(),

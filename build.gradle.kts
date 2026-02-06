@@ -13,9 +13,11 @@ repositories {
 }
 
 dependencies {
-    // Hytale API - Using local stub classes until official API is released
-    // The stub classes are located in src/main/java/com/hypixel/hytale/
-    // When the official Hytale API is available, remove the stubs and uncomment:
+    // Hytale API - Using local stub classes bundled in the JAR until official API is released.
+    // The stub classes are located in src/main/java/com/hypixel/hytale/ and are included
+    // in the shadow JAR so the plugin can load without the official Hytale API.
+    // When the official Hytale API is available, remove the stubs, uncomment the dependency
+    // below, and re-add the exclude("com/hypixel/**") to the shadowJar task:
     // compileOnly("com.hypixel.hytale:hytale-api:+")
     
     // JSON processing
@@ -36,11 +38,11 @@ tasks {
         archiveClassifier.set("")
         archiveBaseName.set("WaypointNavigation")
         
-        // Exclude Hytale API stubs from the JAR - these are compile-only placeholders.
-        // The real classes are provided by the Hytale server at runtime.
-        // When the official Hytale API is available, the stubs can be removed and
-        // the compileOnly dependency uncommented above.
-        exclude("com/hypixel/**")
+        // Include Hytale API stubs in the JAR so the plugin can load without
+        // the official Hytale API on the server's classpath.
+        // When the official Hytale API is available, remove the stubs,
+        // uncomment the compileOnly dependency above, and re-add:
+        //   exclude("com/hypixel/**")
         
         // Relocate dependencies to avoid conflicts
         relocate("com.google.gson", "com.waypointnav.libs.gson")

@@ -71,10 +71,11 @@ cd hytale-waypoint-navigation
 The compiled plugin will be in `build/libs/WaypointNavigation.jar`
 
 ### Note on Hytale API
-Since the official Hytale API has not been released yet, this project includes stub classes for the Hytale API in `src/main/java/com/hypixel/hytale/`. These stubs allow the project to compile but do not provide actual functionality. When Hypixel releases the official API:
+Since the official Hytale API has not been released yet, this project includes stub classes for the Hytale API in `src/main/java/com/hypixel/hytale/`. These stubs are bundled in the shadow JAR so the plugin can load on a server that does not provide the API on its classpath. When Hypixel releases the official API:
 1. Remove the stub classes: `rm -rf src/main/java/com/hypixel/hytale/`
-2. Uncomment the official dependency in `build.gradle.kts`
-3. Rebuild the project
+2. Uncomment the official `compileOnly` dependency in `build.gradle.kts`
+3. Re-add `exclude("com/hypixel/**")` to the `shadowJar` task in `build.gradle.kts`
+4. Rebuild the project
 
 See `src/main/java/com/hypixel/hytale/README.md` for detailed migration instructions.
 

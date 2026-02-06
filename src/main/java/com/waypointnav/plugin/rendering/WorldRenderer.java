@@ -1,9 +1,10 @@
 package com.waypointnav.plugin.rendering;
 
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MathUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
+
+import java.util.logging.Logger;
 /**
  * Handles rendering of world-space markers for waypoints.
  * Creates 3D particle effects and visual indicators in the game world.
@@ -13,7 +14,7 @@ import com.waypointnav.plugin.waypoint.Waypoint;
  * and a dense particle trail guides players from their position toward it.
  */
 public class WorldRenderer {
-    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    private static final Logger LOGGER = Logger.getLogger(WorldRenderer.class.getName());
     private int tickCounter = 0;
 
     // Rendering constants — tuned for maximum visibility
@@ -69,13 +70,13 @@ public class WorldRenderer {
 
         // Don't render if too far away (performance optimization)
         if (distance > MAX_RENDER_DISTANCE) {
-            LOGGER.fine("[DEBUG] Waypoint '%s' is %.1f blocks away (>%.0f), skipping world marker.",
-                waypoint.getName(), distance, MAX_RENDER_DISTANCE);
+            LOGGER.fine(String.format("[DEBUG] Waypoint '%s' is %.1f blocks away (>%.0f), skipping world marker.",
+                waypoint.getName(), distance, MAX_RENDER_DISTANCE));
             return;
         }
 
-        LOGGER.fine("[DEBUG] Rendering world marker for waypoint '%s' at (%.1f, %.1f, %.1f), distance: %.1f",
-            waypoint.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ(), distance);
+        LOGGER.fine(String.format("[DEBUG] Rendering world marker for waypoint '%s' at (%.1f, %.1f, %.1f), distance: %.1f",
+            waypoint.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ(), distance));
 
         // Calculate direction vector from player eye level to waypoint
         double[] direction = MathUtils.directionVector(
@@ -168,8 +169,8 @@ public class WorldRenderer {
     private void spawnParticle(double x, double y, double z, String particleType) {
         // TODO: Use Hytale's particle system when API is available:
         // world.spawnParticle(particleType, x, y, z, count, offsetX, offsetY, offsetZ, speed);
-        LOGGER.fine("[DEBUG] Particle spawn requested: type=%s at (%.2f, %.2f, %.2f) - awaiting Hytale particle API",
-            particleType, x, y, z);
+        LOGGER.fine(String.format("[DEBUG] Particle spawn requested: type=%s at (%.2f, %.2f, %.2f) - awaiting Hytale particle API",
+            particleType, x, y, z));
     }
 
     /**

@@ -1,9 +1,10 @@
 package com.waypointnav.plugin.rendering;
 
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MathUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
+
+import java.util.logging.Logger;
 /**
  * Handles rendering of HUD elements for waypoint navigation.
  * Displays direction arrows and distance information on the player's screen.
@@ -13,7 +14,7 @@ import com.waypointnav.plugin.waypoint.Waypoint;
  * client-side rendering system when available.
  */
 public class HUDRenderer {
-    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    private static final Logger LOGGER = Logger.getLogger(HUDRenderer.class.getName());
     
     /**
      * Renders the HUD for a player.
@@ -76,8 +77,8 @@ public class HUDRenderer {
         // Draw arrow texture rotated to point in correct direction
         // Scale arrow based on how far off-screen the waypoint is
         // Use different colors/styles based on distance
-        LOGGER.fine("[DEBUG] HUD arrow render requested: yawDiff=%.2f, pitchDiff=%.2f - awaiting Hytale HUD API",
-            yawDiff, pitchDiff);
+        LOGGER.fine(String.format("[DEBUG] HUD arrow render requested: yawDiff=%.2f, pitchDiff=%.2f - awaiting Hytale HUD API",
+            yawDiff, pitchDiff));
     }
     
     /**
@@ -94,8 +95,8 @@ public class HUDRenderer {
         // Display formatted distance below name
         // Use color coding based on distance
         // Position text below the arrow
-        LOGGER.fine("[DEBUG] HUD text render requested: waypoint='%s', distance=%s - awaiting Hytale HUD API",
-            name, distanceStr);
+        LOGGER.fine(String.format("[DEBUG] HUD text render requested: waypoint='%s', distance=%s - awaiting Hytale HUD API",
+            name, distanceStr));
     }
     
     /**

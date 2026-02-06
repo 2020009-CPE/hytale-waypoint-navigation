@@ -6,9 +6,9 @@ public class HytaleLogger {
         return new HytaleLogger();
     }
 
-    public void info(String message, Object... args) {
+    public void info(String message) {
     }
 
-    public void fine(String message, Object... args) {
+    public void fine(String message) {
     }
 }

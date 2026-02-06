@@ -16,11 +16,15 @@ public abstract class InteractiveCustomUIPage<T> {
 
     public abstract void build(Ref<EntityStore> ref, UICommandBuilder cmd, UIEventBuilder evt, Store<EntityStore> store);
 
-    public abstract void handleDataEvent(Ref<EntityStore> ref, Store<EntityStore> store, T data);
+    public void handleDataEvent(Ref<EntityStore> ref, Store<EntityStore> store, T data) {
+    }
 
     public void close() {
     }
 
-    public void update(boolean flag, UICommandBuilder cmd) {
+    public void sendUpdate() {
+    }
+
+    public void sendUpdate(UICommandBuilder cmd, UIEventBuilder evt, boolean clearExisting) {
     }
 }

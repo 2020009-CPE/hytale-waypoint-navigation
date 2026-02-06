@@ -1,11 +1,13 @@
 package com.hypixel.hytale.server.core.ui.builder;
 
+import com.hypixel.hytale.server.core.Message;
+
 public class UICommandBuilder {
 
     public UICommandBuilder() {
     }
 
-    public UICommandBuilder append(String selector) {
+    public UICommandBuilder append(String path) {
         return this;
     }
 
@@ -13,7 +15,15 @@ public class UICommandBuilder {
         return this;
     }
 
+    public UICommandBuilder appendInline(String selector, String inlineUI) {
+        return this;
+    }
+
     public UICommandBuilder set(String selector, String value) {
+        return this;
+    }
+
+    public UICommandBuilder set(String selector, Message value) {
         return this;
     }
 

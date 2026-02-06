@@ -49,6 +49,9 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
     public static final String LIST_ITEM = "WaypointNavigation/WaypointListItem.ui";
 
     private final PlayerRef playerRef;
+    private String inputWpName = "";
+    private String inputWpPriority = "";
+    private String inputWpRadius = "";
 
     public WaypointPage(@Nonnull PlayerRef playerRef) {
         super(playerRef, CustomPageLifetime.CanDismiss, WaypointEventData.CODEC);
@@ -80,51 +83,17 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
         // Update status and progress labels
         updateStatusLabels(cmd, playerData);
 
+        // === Track text field value changes ===
+        evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#NameInput", EventData.of("@WpName", "#NameInput.Value"), false);
+        evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#PriorityInput", EventData.of("@WpPriority", "#PriorityInput.Value"), false);
+        evt.addEventBinding(CustomUIEventBindingType.ValueChanged, "#RadiusInput", EventData.of("@WpRadius", "#RadiusInput.Value"), false);
+
         // === Bind action button events ===
-
-        // Add Here button
-        evt.addEventBinding(
-            CustomUIEventBindingType.Activating,
-            "#AddHereBtn",
-            new EventData()
-                .append("Action", "addHere")
-                .append("@WpName", "#NameInput.Value")
-                .append("@WpPriority", "#PriorityInput.Value")
-                .append("@WpRadius", "#RadiusInput.Value"),
-            false
-        );
-
-        // Skip Current button
-        evt.addEventBinding(
-            CustomUIEventBindingType.Activating,
-            "#SkipBtn",
-            new EventData().append("Action", "skip"),
-            false
-        );
-
-        // Skip All button
-        evt.addEventBinding(
-            CustomUIEventBindingType.Activating,
-            "#SkipAllBtn",
-            new EventData().append("Action", "skipAll"),
-            false
-        );
-
-        // Clear All button
-        evt.addEventBinding(
-            CustomUIEventBindingType.Activating,
-            "#ClearBtn",
-            new EventData().append("Action", "clear"),
-            false
-        );
-
-        // Close button
-        evt.addEventBinding(
-            CustomUIEventBindingType.Activating,
-            "#CloseBtn",
-            new EventData().append("Action", "close"),
-            false
-        );
+        evt.addEventBinding(CustomUIEventBindingType.Activating, "#AddHereBtn", EventData.of("Action", "addHere"), false);
+        evt.addEventBinding(CustomUIEventBindingType.Activating, "#SkipBtn", EventData.of("Action", "skip"), false);
+        evt.addEventBinding(CustomUIEventBindingType.Activating, "#SkipAllBtn", EventData.of("Action", "skipAll"), false);
+        evt.addEventBinding(CustomUIEventBindingType.Activating, "#ClearBtn", EventData.of("Action", "clear"), false);
+        evt.addEventBinding(CustomUIEventBindingType.Activating, "#CloseBtn", EventData.of("Action", "close"), false);
     }
 
     /**
@@ -155,9 +124,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
             evt.addEventBinding(
                 CustomUIEventBindingType.Activating,
                 selector,
-                new EventData()
-                    .append("Action", "removeWaypoint")
-                    .append("Index", String.valueOf(i)),
+                EventData.of("Action", "removeWaypoint:" + i),
                 false
             );
         }
@@ -197,20 +164,34 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
             @Nonnull Store<EntityStore> store,
             @Nonnull WaypointEventData data
     ) {
+        super.handleDataEvent(ref, store, data);
+
+        // Track input field changes
+        if (data.wpName != null) {
+            this.inputWpName = data.wpName;
+        }
+        if (data.wpPriority != null) {
+            this.inputWpPriority = data.wpPriority;
+        }
+        if (data.wpRadius != null) {
+            this.inputWpRadius = data.wpRadius;
+        }
+
         WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
         UUID playerUuid = playerRef.getUuid();
         PlayerWaypointData playerData = plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
 
-        LOGGER.atInfo().log("Waypoint UI event: action=%s, index=%s, name=%s",
-            data.action, data.index, data.wpName);
+        String action = data.action != null ? data.action : "";
 
-        switch (data.action != null ? data.action : "") {
+        LOGGER.atInfo().log("Waypoint UI event: action=%s, name=%s",
+            data.action, data.wpName);
+
+        if (action.startsWith("removeWaypoint:")) {
+            int index = parseIntSafe(action.substring("removeWaypoint:".length()), -1);
+            handleRemoveWaypoint(plugin, playerData, index);
+        } else switch (action) {
             case "addHere":
-                handleAddHere(plugin, playerData, data);
-                break;
-
-            case "removeWaypoint":
-                handleRemoveWaypoint(plugin, playerData, data);
+                handleAddHere(plugin, playerData);
                 break;
 
             case "skip":
@@ -242,11 +223,10 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
      * Handles the "Add Here" button — creates a waypoint at the player's position.
      */
     private void handleAddHere(WaypointNavigationPlugin plugin,
-                                PlayerWaypointData playerData,
-                                WaypointEventData data) {
-        String name = (data.wpName != null && !data.wpName.isEmpty()) ? data.wpName : "Waypoint";
-        int priority = parseIntSafe(data.wpPriority, 0);
-        double radius = parseDoubleSafe(data.wpRadius,
+                                PlayerWaypointData playerData) {
+        String name = (!inputWpName.isEmpty()) ? inputWpName : "Waypoint";
+        int priority = parseIntSafe(inputWpPriority, 0);
+        double radius = parseDoubleSafe(inputWpRadius,
             plugin.getConfigManager().getDouble("waypoint.defaultRadius", 5.0));
 
         if (radius <= 0) radius = 5.0;
@@ -284,8 +264,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
      */
     private void handleRemoveWaypoint(WaypointNavigationPlugin plugin,
                                        PlayerWaypointData playerData,
-                                       WaypointEventData data) {
-        int index = parseIntSafe(data.index, -1);
+                                       int index) {
         List<Waypoint> waypoints = playerData.getWaypoints();
 
         if (index < 0 || index >= waypoints.size()) {
@@ -389,6 +368,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
      */
     private void refreshUI(WaypointNavigationPlugin plugin, PlayerWaypointData playerData) {
         UICommandBuilder cmd = new UICommandBuilder();
+        UIEventBuilder evt = new UIEventBuilder();
 
         // Clear the list container
         cmd.clear("#WaypointList");
@@ -408,7 +388,16 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
                 status, i + 1, wp.getName(), wp.getPriority(), distStr);
 
             cmd.append("#WaypointList", LIST_ITEM);
-            cmd.set("#WaypointList[" + i + "].Text", label);
+            String selector = "#WaypointList[" + i + "]";
+            cmd.set(selector + ".Text", label);
+
+            // Re-register remove event binding for dynamically added items
+            evt.addEventBinding(
+                CustomUIEventBindingType.Activating,
+                selector,
+                EventData.of("Action", "removeWaypoint:" + i),
+                false
+            );
         }
 
         if (waypoints.isEmpty()) {
@@ -433,7 +422,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
         cmd.set("#StatusLabel.Text", statusText);
         cmd.set("#ProgressLabel.Text", completed + "/" + total + " completed");
 
-        this.update(false, cmd);
+        this.sendUpdate(cmd, evt, false);
     }
 
     // --- Parsing helpers ---
@@ -454,25 +443,17 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
         public static final BuilderCodec<WaypointEventData> CODEC = BuilderCodec.builder(
                 WaypointEventData.class, WaypointEventData::new
         )
-        .append(new KeyedCodec<>("Action", Codec.STRING),
+        .addField(new KeyedCodec<>("Action", Codec.STRING),
             (e, v) -> e.action = v, e -> e.action)
-        .add()
-        .append(new KeyedCodec<>("Index", Codec.STRING),
-            (e, v) -> e.index = v, e -> e.index)
-        .add()
-        .append(new KeyedCodec<>("WpName", Codec.STRING),
+        .addField(new KeyedCodec<>("@WpName", Codec.STRING),
             (e, v) -> e.wpName = v, e -> e.wpName)
-        .add()
-        .append(new KeyedCodec<>("WpPriority", Codec.STRING),
+        .addField(new KeyedCodec<>("@WpPriority", Codec.STRING),
             (e, v) -> e.wpPriority = v, e -> e.wpPriority)
-        .add()
-        .append(new KeyedCodec<>("WpRadius", Codec.STRING),
+        .addField(new KeyedCodec<>("@WpRadius", Codec.STRING),
             (e, v) -> e.wpRadius = v, e -> e.wpRadius)
-        .add()
         .build();
 
         private String action;
-        private String index;
         private String wpName;
         private String wpPriority;
         private String wpRadius;

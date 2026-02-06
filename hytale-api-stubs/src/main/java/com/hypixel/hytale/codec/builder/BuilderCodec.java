@@ -12,11 +12,7 @@ public class BuilderCodec<T> {
     }
 
     public static class Builder<T> {
-        public <V> Builder<T> append(KeyedCodec<V> codec, BiConsumer<T, V> setter, Function<T, V> getter) {
-            return this;
-        }
-
-        public Builder<T> add() {
+        public <V> Builder<T> addField(KeyedCodec<V> codec, BiConsumer<T, V> setter, Function<T, V> getter) {
             return this;
         }
 

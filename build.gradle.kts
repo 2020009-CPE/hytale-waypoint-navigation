@@ -36,6 +36,9 @@ tasks {
         archiveClassifier.set("")
         archiveBaseName.set("WaypointNavigation")
         
+        // Exclude Hytale API stubs from the JAR - the server provides these at runtime
+        exclude("com/hypixel/hytale/**")
+        
         // Relocate dependencies to avoid conflicts
         relocate("com.google.gson", "com.waypointnav.libs.gson")
     }

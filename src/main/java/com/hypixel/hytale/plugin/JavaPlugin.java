@@ -11,8 +11,8 @@ public abstract class JavaPlugin {
     private Path dataFolder;
     
     public JavaPlugin(JavaPluginInit init) {
-        // Default to plugins directory - subclasses can customize via getDataFolder override
-        this.dataFolder = Paths.get("plugins", this.getClass().getSimpleName());
+        // Default to mods directory - subclasses can customize via getDataFolder override
+        this.dataFolder = Paths.get("mods", this.getClass().getSimpleName());
     }
     
     public abstract void setup();

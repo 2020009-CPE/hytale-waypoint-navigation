@@ -1,3 +1,9 @@
+require(JavaVersion.current() >= JavaVersion.VERSION_25) {
+    "This project requires Java 25 or higher to build. " +
+    "Current JVM version is ${JavaVersion.current()}. " +
+    "Please install Java 25 and set JAVA_HOME to the Java 25 installation directory."
+}
+
 pluginManagement {
     repositories {
         gradlePluginPortal()

@@ -56,7 +56,7 @@ public class AddCommand extends AbstractPlayerCommand {
             return;
         }
         
-        // Get player location from entity store
+        // Get player location from store
         Vec3d position = store.getPosition(ref);
         
         // Check waypoint limit

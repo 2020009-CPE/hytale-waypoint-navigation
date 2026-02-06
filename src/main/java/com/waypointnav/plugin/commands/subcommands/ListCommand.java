@@ -48,7 +48,7 @@ public class ListCommand extends AbstractPlayerCommand {
         List<Waypoint> waypoints = playerData.getWaypoints();
         int activeIndex = playerData.getActiveWaypointIndex();
         
-        // Get player location from entity store
+        // Get player location from store
         Vec3d position = store.getPosition(ref);
         
         playerRef.sendMessage(Message.raw(MessageUtils.header("Your Waypoints")));

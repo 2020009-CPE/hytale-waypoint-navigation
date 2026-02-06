@@ -10,8 +10,9 @@ import javax.annotation.Nonnull;
  * Handles rendering of world-space markers for waypoints.
  * Creates 3D particle effects and visual indicators in the game world.
  * 
- * TODO: Integrate with Hytale's particle system when API is available.
- * This is a placeholder implementation showing the logic needed.
+ * Note: Specific Hytale particle APIs are not yet documented.
+ * This class provides the logic framework ready for integration with Hytale's
+ * particle system when available.
  */
 public class WorldRenderer {
     private int tickCounter = 0;
@@ -46,7 +47,7 @@ public class WorldRenderer {
     
     /**
      * Renders a marker for a waypoint in the world.
-     * TODO: Implement with Hytale particle API
+     * Placeholder for Hytale particle API integration.
      *
      * @param waypoint The waypoint to mark
      * @param playerX Player's X position
@@ -81,7 +82,7 @@ public class WorldRenderer {
     
     /**
      * Renders a line of particles pointing toward the waypoint.
-     * TODO: Implement with Hytale particle API
+     * Placeholder for Hytale particle API integration.
      *
      * @param startX Start X position
      * @param startY Start Y position
@@ -94,7 +95,6 @@ public class WorldRenderer {
     private void renderParticleLine(double startX, double startY, double startZ,
                                    double dirX, double dirY, double dirZ,
                                    double distance) {
-        // TODO: Use Hytale particle API
         // Spawn particles in a line from player toward waypoint
         // Particle spacing should be about 2 blocks
         // Limit to first 20 blocks to avoid clutter
@@ -107,7 +107,7 @@ public class WorldRenderer {
             double y = startY + dirY * step;
             double z = startZ + dirZ * step;
             
-            // TODO: Spawn particle at (x, y, z)
+            // Use Hytale's particle system to spawn particle at (x, y, z)
             // Use different particle types based on distance:
             // - Close: Green particles
             // - Medium: Yellow particles
@@ -118,14 +118,14 @@ public class WorldRenderer {
     
     /**
      * Renders a beacon effect at the waypoint location.
-     * TODO: Implement with Hytale particle API
+     * Placeholder for Hytale particle API integration.
      *
      * @param x Waypoint X position
      * @param y Waypoint Y position
      * @param z Waypoint Z position
      */
     private void renderWaypointBeacon(double x, double y, double z) {
-        // TODO: Create a vertical beam of particles at waypoint location
+        // Create a vertical beam of particles at waypoint location
         // Spiral or circular pattern works well
         
         double angle = (tickCounter * 10) % 360;
@@ -138,21 +138,19 @@ public class WorldRenderer {
             double offsetX = Math.cos(offsetAngle) * radius;
             double offsetZ = Math.sin(offsetAngle) * radius;
             
-            // TODO: Spawn particle at waypoint location with offset
             spawnParticle(x + offsetX, y, z + offsetZ, "FLAME");
         }
         
         // Vertical beam
         for (int i = 0; i < 5; i++) {
             double offsetY = y + (i * 0.5);
-            // TODO: Spawn particle for vertical beam
             spawnParticle(x, offsetY, z, "END_ROD");
         }
     }
     
     /**
      * Spawns a particle at the specified location.
-     * TODO: Implement with Hytale particle API
+     * Placeholder for Hytale particle API integration.
      *
      * @param x X position
      * @param y Y position
@@ -160,8 +158,7 @@ public class WorldRenderer {
      * @param particleType Type of particle to spawn
      */
     private void spawnParticle(double x, double y, double z, @Nonnull String particleType) {
-        // Placeholder for particle spawning
-        // In actual implementation, use Hytale's particle system:
+        // Use Hytale's particle system:
         // world.spawnParticle(particleType, x, y, z, count, offsetX, offsetY, offsetZ, speed);
     }
     

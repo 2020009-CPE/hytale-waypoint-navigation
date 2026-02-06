@@ -1,53 +1,68 @@
 package com.waypointnav.plugin.commands.subcommands;
 
+import com.hypixel.hytale.command.AbstractPlayerCommand;
+import com.hypixel.hytale.command.CommandContext;
+import com.hypixel.hytale.entity.Player;
+import com.hypixel.hytale.entity.PlayerRef;
+import com.hypixel.hytale.message.Message;
+import com.hypixel.hytale.permission.GameMode;
+import com.hypixel.hytale.store.EntityStore;
+import com.hypixel.hytale.store.Ref;
+import com.hypixel.hytale.store.Store;
+import com.hypixel.hytale.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MessageUtils;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * Command to skip all remaining waypoints.
  * Usage: /waypoint skipall
  */
-public class SkipAllCommand {
-    private final WaypointNavigationPlugin plugin;
+public class SkipAllCommand extends AbstractPlayerCommand {
     
-    public SkipAllCommand(@Nonnull WaypointNavigationPlugin plugin) {
-        this.plugin = plugin;
+    public SkipAllCommand() {
+        super("skipall", "Skip all remaining waypoints");
+        this.setPermissionGroup(GameMode.Adventure);
     }
     
-    /**
-     * Executes the skipall command.
-     *
-     * @param player The player executing the command
-     * @param args Command arguments
-     */
-    public void execute(Object player, String[] args) {
-        // TODO: Implement with Hytale API
-        // UUID playerUuid = player.getUniqueId();
-        // PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
+    @Override
+    protected void execute(@Nonnull CommandContext ctx,
+                         @Nonnull Store<EntityStore> store,
+                         @Nonnull Ref<EntityStore> ref,
+                         @Nonnull PlayerRef playerRef,
+                         @Nonnull World world) {
         
-        // if (playerData == null || playerData.getWaypoints().isEmpty()) {
-        //     player.sendMessage(MessageUtils.error("You have no waypoints!"));
-        //     return;
-        // }
+        WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
+        Player player = store.getComponent(ref, Player.getComponentType());
+        UUID playerUuid = player.getUuid();
         
-        // long uncompleted = playerData.getWaypoints().stream()
-        //     .filter(wp -> !wp.isCompleted())
-        //     .count();
+        PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
         
-        // if (uncompleted == 0) {
-        //     player.sendMessage(MessageUtils.info("All waypoints are already completed!"));
-        //     return;
-        // }
+        if (playerData == null || playerData.getWaypoints().isEmpty()) {
+            player.sendMessage(Message.raw(MessageUtils.error("You have no waypoints!")));
+            return;
+        }
         
-        // playerData.skipAllWaypoints();
+        long uncompleted = playerData.getWaypoints().stream()
+            .filter(wp -> !wp.isCompleted())
+            .count();
         
-        // // Save
-        // plugin.getStorage().savePlayerDataAsync(playerData);
+        if (uncompleted == 0) {
+            player.sendMessage(Message.raw(MessageUtils.info("All waypoints are already completed!")));
+            return;
+        }
         
-        // player.sendMessage(MessageUtils.success("Skipped all remaining waypoints (" + uncompleted + ")!"));
-        // player.sendMessage(MessageUtils.success("All waypoints completed!"));
+        playerData.skipAllWaypoints();
+        
+        // Save
+        plugin.getStorage().savePlayerDataAsync(playerData);
+        
+        player.sendMessage(Message.raw(
+            MessageUtils.success("Skipped all remaining waypoints (" + uncompleted + ")!")
+        ));
+        player.sendMessage(Message.raw(MessageUtils.success("All waypoints completed!")));
     }
 }

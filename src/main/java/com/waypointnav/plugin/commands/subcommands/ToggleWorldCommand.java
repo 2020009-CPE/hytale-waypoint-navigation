@@ -1,40 +1,53 @@
 package com.waypointnav.plugin.commands.subcommands;
 
+import com.hypixel.hytale.command.AbstractPlayerCommand;
+import com.hypixel.hytale.command.CommandContext;
+import com.hypixel.hytale.entity.Player;
+import com.hypixel.hytale.entity.PlayerRef;
+import com.hypixel.hytale.message.Message;
+import com.hypixel.hytale.permission.GameMode;
+import com.hypixel.hytale.store.EntityStore;
+import com.hypixel.hytale.store.Ref;
+import com.hypixel.hytale.store.Store;
+import com.hypixel.hytale.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MessageUtils;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * Command to toggle world markers on/off.
  * Usage: /waypoint toggle-world
  */
-public class ToggleWorldCommand {
-    private final WaypointNavigationPlugin plugin;
+public class ToggleWorldCommand extends AbstractPlayerCommand {
     
-    public ToggleWorldCommand(@Nonnull WaypointNavigationPlugin plugin) {
-        this.plugin = plugin;
+    public ToggleWorldCommand() {
+        super("toggle-world", "Toggle world markers on/off");
+        this.setPermissionGroup(GameMode.Adventure);
     }
     
-    /**
-     * Executes the toggle-world command.
-     *
-     * @param player The player executing the command
-     * @param args Command arguments
-     */
-    public void execute(Object player, String[] args) {
-        // TODO: Implement with Hytale API
-        // UUID playerUuid = player.getUniqueId();
-        // PlayerWaypointData playerData = plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
+    @Override
+    protected void execute(@Nonnull CommandContext ctx,
+                         @Nonnull Store<EntityStore> store,
+                         @Nonnull Ref<EntityStore> ref,
+                         @Nonnull PlayerRef playerRef,
+                         @Nonnull World world) {
         
-        // boolean newState = !playerData.isWorldMarkersEnabled();
-        // playerData.setWorldMarkersEnabled(newState);
+        WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
+        Player player = store.getComponent(ref, Player.getComponentType());
+        UUID playerUuid = player.getUuid();
         
-        // // Save
-        // plugin.getStorage().savePlayerDataAsync(playerData);
+        PlayerWaypointData playerData = plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
         
-        // String status = newState ? "§aenabled" : "§cdisabled";
-        // player.sendMessage(MessageUtils.success("World markers " + status + "!"));
+        boolean newState = !playerData.isWorldMarkersEnabled();
+        playerData.setWorldMarkersEnabled(newState);
+        
+        // Save
+        plugin.getStorage().savePlayerDataAsync(playerData);
+        
+        String status = newState ? "§aenabled" : "§cdisabled";
+        player.sendMessage(Message.raw(MessageUtils.success("World markers " + status + "!")));
     }
 }

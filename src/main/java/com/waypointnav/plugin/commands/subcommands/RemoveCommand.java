@@ -1,5 +1,17 @@
 package com.waypointnav.plugin.commands.subcommands;
 
+import com.hypixel.hytale.command.AbstractPlayerCommand;
+import com.hypixel.hytale.command.CommandContext;
+import com.hypixel.hytale.command.argument.RequiredArg;
+import com.hypixel.hytale.command.argument.type.ArgTypes;
+import com.hypixel.hytale.entity.Player;
+import com.hypixel.hytale.entity.PlayerRef;
+import com.hypixel.hytale.message.Message;
+import com.hypixel.hytale.permission.GameMode;
+import com.hypixel.hytale.store.EntityStore;
+import com.hypixel.hytale.store.Ref;
+import com.hypixel.hytale.store.Store;
+import com.hypixel.hytale.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MessageUtils;
@@ -7,58 +19,54 @@ import com.waypointnav.plugin.waypoint.Waypoint;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Command to remove a waypoint by index.
  * Usage: /waypoint remove <index>
  */
-public class RemoveCommand {
-    private final WaypointNavigationPlugin plugin;
+public class RemoveCommand extends AbstractPlayerCommand {
+    private final RequiredArg<Integer> indexArg;
     
-    public RemoveCommand(@Nonnull WaypointNavigationPlugin plugin) {
-        this.plugin = plugin;
+    public RemoveCommand() {
+        super("remove", "Remove a waypoint by index");
+        this.setPermissionGroup(GameMode.Adventure);
+        
+        this.indexArg = withRequiredArg("index", "Index of the waypoint to remove", ArgTypes.INTEGER);
     }
     
-    /**
-     * Executes the remove command.
-     *
-     * @param player The player executing the command
-     * @param args Command arguments
-     */
-    public void execute(Object player, String[] args) {
-        // TODO: Implement with Hytale API
-        // if (args.length < 2) {
-        //     player.sendMessage(MessageUtils.error("Usage: /waypoint remove <index>"));
-        //     return;
-        // }
+    @Override
+    protected void execute(@Nonnull CommandContext ctx,
+                         @Nonnull Store<EntityStore> store,
+                         @Nonnull Ref<EntityStore> ref,
+                         @Nonnull PlayerRef playerRef,
+                         @Nonnull World world) {
         
-        // UUID playerUuid = player.getUniqueId();
-        // PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
+        WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
+        Player player = store.getComponent(ref, Player.getComponentType());
+        UUID playerUuid = player.getUuid();
         
-        // if (playerData == null || playerData.getWaypoints().isEmpty()) {
-        //     player.sendMessage(MessageUtils.error("You have no waypoints!"));
-        //     return;
-        // }
+        PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
         
-        // try {
-        //     int index = Integer.parseInt(args[1]) - 1; // Convert to 0-based index
-        //     List<Waypoint> waypoints = playerData.getWaypoints();
-        //     
-        //     if (index < 0 || index >= waypoints.size()) {
-        //         player.sendMessage(MessageUtils.error("Invalid waypoint index!"));
-        //         return;
-        //     }
-        //     
-        //     Waypoint waypoint = waypoints.get(index);
-        //     playerData.removeWaypoint(waypoint);
-        //     
-        //     // Save asynchronously
-        //     plugin.getStorage().savePlayerDataAsync(playerData);
-        //     
-        //     player.sendMessage(MessageUtils.success("Removed waypoint: " + waypoint.getName()));
-        //     
-        // } catch (NumberFormatException e) {
-        //     player.sendMessage(MessageUtils.error("Invalid index!"));
-        // }
+        if (playerData == null || playerData.getWaypoints().isEmpty()) {
+            player.sendMessage(Message.raw(MessageUtils.error("You have no waypoints!")));
+            return;
+        }
+        
+        int index = indexArg.get(ctx) - 1; // Convert to 0-based index
+        List<Waypoint> waypoints = playerData.getWaypoints();
+        
+        if (index < 0 || index >= waypoints.size()) {
+            player.sendMessage(Message.raw(MessageUtils.error("Invalid waypoint index!")));
+            return;
+        }
+        
+        Waypoint waypoint = waypoints.get(index);
+        playerData.removeWaypoint(waypoint);
+        
+        // Save asynchronously
+        plugin.getStorage().savePlayerDataAsync(playerData);
+        
+        player.sendMessage(Message.raw(MessageUtils.success("Removed waypoint: " + waypoint.getName())));
     }
 }

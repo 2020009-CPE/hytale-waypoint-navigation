@@ -1,15 +1,16 @@
 package com.waypointnav.plugin.listeners;
 
+import com.hypixel.hytale.entity.PlayerRef;
+import com.hypixel.hytale.event.EventHandler;
+import com.hypixel.hytale.event.player.PlayerReadyEvent;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * Handles player join events to load waypoint data.
- * 
- * TODO: Implement with Hytale event system when API is available.
- * This is a placeholder showing the required logic.
  */
 public class PlayerJoinListener {
     private final WaypointNavigationPlugin plugin;
@@ -20,46 +21,32 @@ public class PlayerJoinListener {
     
     /**
      * Called when a player joins the server.
-     * TODO: Annotate with Hytale's event handler annotation
      *
-     * @param event The player join event
+     * @param event The player ready event
      */
-    // @EventHandler // TODO: Use Hytale's event annotation
-    public void onPlayerJoin(Object event) {
-        // TODO: Extract player from event using Hytale API
-        // Player player = event.getPlayer();
-        // UUID playerUuid = player.getUniqueId();
+    @EventHandler
+    public void onPlayerReady(@Nonnull PlayerReadyEvent event) {
+        PlayerRef playerRef = event.getPlayerRef();
+        UUID playerUuid = playerRef.getUuid();
         
         // Load player data asynchronously
-        // plugin.getStorage().loadPlayerDataAsync(playerUuid).thenAccept(data -> {
-        //     if (data != null) {
-        //         plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
-        //         // Copy loaded data into player data manager
-        //         PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
-        //         if (playerData != null) {
-        //             // Merge loaded waypoints
-        //             data.getWaypoints().forEach(playerData::addWaypoint);
-        //             playerData.setActiveWaypointIndex(data.getActiveWaypointIndex());
-        //             playerData.setNavigationEnabled(data.isNavigationEnabled());
-        //             playerData.setHudEnabled(data.isHudEnabled());
-        //             playerData.setWorldMarkersEnabled(data.isWorldMarkersEnabled());
-        //         }
-        //     } else {
-        //         // Create new player data
-        //         plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
-        //     }
-        // });
-        
-        // Send welcome message
-        // player.sendMessage(MessageUtils.info("Waypoint Navigation plugin loaded!"));
-    }
-    
-    /**
-     * Registers this listener with the event system.
-     * TODO: Use Hytale's event registration system
-     */
-    public void register() {
-        // TODO: Register with Hytale's event bus
-        // plugin.getEventManager().registerListener(this);
+        plugin.getStorage().loadPlayerDataAsync(playerUuid).thenAccept(data -> {
+            if (data != null) {
+                plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
+                // Copy loaded data into player data manager
+                PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
+                if (playerData != null) {
+                    // Merge loaded waypoints
+                    data.getWaypoints().forEach(playerData::addWaypoint);
+                    playerData.setActiveWaypointIndex(data.getActiveWaypointIndex());
+                    playerData.setNavigationEnabled(data.isNavigationEnabled());
+                    playerData.setHudEnabled(data.isHudEnabled());
+                    playerData.setWorldMarkersEnabled(data.isWorldMarkersEnabled());
+                }
+            } else {
+                // Create new player data
+                plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
+            }
+        });
     }
 }

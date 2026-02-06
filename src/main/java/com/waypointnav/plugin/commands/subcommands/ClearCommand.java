@@ -1,44 +1,57 @@
 package com.waypointnav.plugin.commands.subcommands;
 
+import com.hypixel.hytale.command.AbstractPlayerCommand;
+import com.hypixel.hytale.command.CommandContext;
+import com.hypixel.hytale.entity.Player;
+import com.hypixel.hytale.entity.PlayerRef;
+import com.hypixel.hytale.message.Message;
+import com.hypixel.hytale.permission.GameMode;
+import com.hypixel.hytale.store.EntityStore;
+import com.hypixel.hytale.store.Ref;
+import com.hypixel.hytale.store.Store;
+import com.hypixel.hytale.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MessageUtils;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * Command to clear all waypoints for a player.
  * Usage: /waypoint clear
  */
-public class ClearCommand {
-    private final WaypointNavigationPlugin plugin;
+public class ClearCommand extends AbstractPlayerCommand {
     
-    public ClearCommand(@Nonnull WaypointNavigationPlugin plugin) {
-        this.plugin = plugin;
+    public ClearCommand() {
+        super("clear", "Clear all your waypoints");
+        this.setPermissionGroup(GameMode.Adventure);
     }
     
-    /**
-     * Executes the clear command.
-     *
-     * @param player The player executing the command
-     * @param args Command arguments
-     */
-    public void execute(Object player, String[] args) {
-        // TODO: Implement with Hytale API
-        // UUID playerUuid = player.getUniqueId();
-        // PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
+    @Override
+    protected void execute(@Nonnull CommandContext ctx,
+                         @Nonnull Store<EntityStore> store,
+                         @Nonnull Ref<EntityStore> ref,
+                         @Nonnull PlayerRef playerRef,
+                         @Nonnull World world) {
         
-        // if (playerData == null || playerData.getWaypoints().isEmpty()) {
-        //     player.sendMessage(MessageUtils.error("You have no waypoints to clear!"));
-        //     return;
-        // }
+        WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
+        Player player = store.getComponent(ref, Player.getComponentType());
+        UUID playerUuid = player.getUuid();
         
-        // int count = playerData.getWaypoints().size();
-        // playerData.clearWaypoints();
+        PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
         
-        // // Save asynchronously
-        // plugin.getStorage().savePlayerDataAsync(playerData);
+        if (playerData == null || playerData.getWaypoints().isEmpty()) {
+            player.sendMessage(Message.raw(MessageUtils.error("You have no waypoints to clear!")));
+            return;
+        }
         
-        // player.sendMessage(MessageUtils.success("Cleared " + count + " waypoint(s)!"));
+        int count = playerData.getWaypoints().size();
+        playerData.clearWaypoints();
+        
+        // Save asynchronously
+        plugin.getStorage().savePlayerDataAsync(playerData);
+        
+        player.sendMessage(Message.raw(MessageUtils.success("Cleared " + count + " waypoint(s)!")));
     }
 }

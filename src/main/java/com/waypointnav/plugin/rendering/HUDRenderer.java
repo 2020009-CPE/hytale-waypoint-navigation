@@ -10,8 +10,9 @@ import javax.annotation.Nonnull;
  * Handles rendering of HUD elements for waypoint navigation.
  * Displays direction arrows and distance information on the player's screen.
  * 
- * TODO: Integrate with Hytale's rendering API when available.
- * This is a placeholder implementation showing the logic needed.
+ * Note: Specific Hytale rendering APIs for HUD elements are not yet documented.
+ * This class provides the logic framework ready for integration with Hytale's
+ * client-side rendering system when available.
  */
 public class HUDRenderer {
     
@@ -50,7 +51,7 @@ public class HUDRenderer {
         double yawDiff = MathUtils.angleDifference(playerYaw, targetYaw);
         double pitchDiff = MathUtils.angleDifference(playerPitch, targetPitch);
         
-        // TODO: Use Hytale's rendering API to:
+        // Hytale's rendering API integration would go here:
         // 1. Draw a 2D arrow on screen pointing in direction of waypoint
         // 2. The arrow should rotate based on yawDiff
         // 3. Display distance text below the arrow
@@ -63,37 +64,31 @@ public class HUDRenderer {
     
     /**
      * Renders a directional arrow pointing toward the waypoint.
-     * TODO: Implement with Hytale rendering API
+     * Placeholder for Hytale rendering API integration.
      *
      * @param yawDiff The yaw difference in degrees
      * @param pitchDiff The pitch difference in degrees
      */
     private void renderArrow(double yawDiff, double pitchDiff) {
-        // Placeholder for arrow rendering
-        // In actual implementation:
-        // - Calculate screen position based on yawDiff and pitchDiff
-        // - Draw arrow texture rotated to point in correct direction
-        // - Scale arrow based on how far off-screen the waypoint is
-        // - Use different colors/styles based on distance
+        // Calculate screen position based on yawDiff and pitchDiff
+        // Draw arrow texture rotated to point in correct direction
+        // Scale arrow based on how far off-screen the waypoint is
+        // Use different colors/styles based on distance
     }
     
     /**
      * Renders distance and name text for the active waypoint.
-     * TODO: Implement with Hytale text rendering API
+     * Placeholder for Hytale text rendering API integration.
      *
      * @param distance Distance to waypoint
      * @param name Waypoint name
      */
     private void renderDistanceText(double distance, @Nonnull String name) {
-        // Placeholder for text rendering
-        // In actual implementation:
-        // - Display waypoint name at top
-        // - Display formatted distance below name
-        // - Use color coding based on distance
-        // - Position text below the arrow
-        
         String distanceStr = MathUtils.formatDistance(distance);
-        // TODO: Render text: name + " - " + distanceStr
+        // Display waypoint name at top
+        // Display formatted distance below name
+        // Use color coding based on distance
+        // Position text below the arrow
     }
     
     /**
@@ -118,6 +113,6 @@ public class HUDRenderer {
      * Clears the HUD display.
      */
     public void clear() {
-        // TODO: Clear any rendered HUD elements
+        // Clear any rendered HUD elements using Hytale's rendering API
     }
 }

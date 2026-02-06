@@ -1,0 +1,25 @@
+{
+  "hud": {
+    "enabled": true,
+    "showDistance": true,
+    "showCoordinates": true,
+    "arrowColor": "YELLOW"
+  },
+  "world": {
+    "enabled": true,
+    "particleType": "FLAME",
+    "particleCount": 10,
+    "updateInterval": 20
+  },
+  "waypoint": {
+    "defaultRadius": 5.0,
+    "autoProgress": true,
+    "playSound": true,
+    "maxWaypoints": 50
+  },
+  "playerScope": true,
+  "autoSave": {
+    "enabled": true,
+    "interval": 300
+  }
+}

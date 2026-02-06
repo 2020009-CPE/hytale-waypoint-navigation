@@ -25,12 +25,12 @@ public class PlayerJoinListener {
      */
     public void onPlayerJoin(PlayerRef playerRef) {
         UUID playerUuid = playerRef.getUuid();
-        LOGGER.atInfo().log("[DEBUG] Player %s joined. Loading waypoint data...", playerUuid);
+        LOGGER.atInfo().log("Player %s joined. Loading waypoint data...", playerUuid);
         
         // Load player data asynchronously
         plugin.getStorage().loadPlayerDataAsync(playerUuid).thenAccept(data -> {
             if (data != null) {
-                LOGGER.atInfo().log("[DEBUG] Loaded %d waypoint(s) for player %s.",
+                LOGGER.atInfo().log("Loaded %d waypoint(s) for player %s.",
                     data.getWaypoints().size(), playerUuid);
                 plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
                 // Copy loaded data into player data manager
@@ -44,7 +44,7 @@ public class PlayerJoinListener {
                     playerData.setWorldMarkersEnabled(data.isWorldMarkersEnabled());
                 }
             } else {
-                LOGGER.atInfo().log("[DEBUG] No saved data found for player %s. Creating new profile.", playerUuid);
+                LOGGER.atInfo().log("No saved data found for player %s. Creating new profile.", playerUuid);
                 // Create new player data
                 plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
             }

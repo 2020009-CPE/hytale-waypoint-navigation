@@ -252,14 +252,14 @@ Hytale does not support Minecraft-style color codes (`§` section-sign codes or 
 
 ### Debug Logging
 
-The plugin includes debug log messages throughout the rendering pipeline, player listeners, and plugin lifecycle. These messages appear in the server console and help diagnose issues such as:
+The plugin includes log messages throughout the rendering pipeline, player listeners, and plugin lifecycle. These messages appear in the server console and help diagnose issues such as:
 
-- Particles not appearing (check for `[DEBUG] Particle spawn requested` messages)
-- HUD not rendering (check for `[DEBUG] HUD disabled` or `[DEBUG] No active waypoint` messages)
-- Player data not loading/saving (check for `[DEBUG] Player ... joined` messages)
-- Waypoint completion not triggering (check for `[DEBUG] Player ... reached waypoint` messages)
+- Particles not appearing (check for `Particle spawn requested` messages at FINE level)
+- HUD not rendering (check for `HUD disabled` or `No active waypoint` messages at FINE level)
+- Player data not loading/saving (check for `Player ... joined` messages at INFO level)
+- Waypoint completion not triggering (check for `Player ... reached waypoint` messages at INFO level)
 
-Debug messages use Hytale's `HytaleLogger` system. Fine-level messages (`atFine`) are only shown when the logging level is set to FINE or lower.
+Info-level messages (plugin setup, player join/quit, waypoint completion) are always visible. Fine-level messages (per-tick rendering and particle details) require the logging level to be set to FINE or lower.
 
 ## Contributing
 

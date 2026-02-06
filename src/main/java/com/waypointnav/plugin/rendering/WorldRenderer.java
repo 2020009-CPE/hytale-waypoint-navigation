@@ -191,7 +191,7 @@ public class WorldRenderer {
      * Clears all world markers.
      */
     public void clear() {
-        LOGGER.atInfo().log("[DEBUG] Clearing all world markers, resetting tick counter.");
+        LOGGER.atFine().log("[DEBUG] Clearing all world markers, resetting tick counter.");
         tickCounter = 0;
     }
 }

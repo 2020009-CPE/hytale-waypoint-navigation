@@ -25,17 +25,17 @@ public class PlayerQuitListener {
      */
     public void onPlayerQuit(PlayerRef playerRef) {
         UUID playerUuid = playerRef.getUuid();
-        LOGGER.atInfo().log("[DEBUG] Player %s quit. Saving waypoint data...", playerUuid);
+        LOGGER.atInfo().log("Player %s quit. Saving waypoint data...", playerUuid);
         
         // Get player data
         PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
         if (playerData != null) {
-            LOGGER.atInfo().log("[DEBUG] Saving %d waypoint(s) for player %s.",
+            LOGGER.atInfo().log("Saving %d waypoint(s) for player %s.",
                 playerData.getWaypoints().size(), playerUuid);
             // Save player data asynchronously
             plugin.getStorage().savePlayerDataAsync(playerData);
         } else {
-            LOGGER.atInfo().log("[DEBUG] No waypoint data found for player %s, nothing to save.", playerUuid);
+            LOGGER.atInfo().log("No waypoint data found for player %s, nothing to save.", playerUuid);
         }
     }
 }

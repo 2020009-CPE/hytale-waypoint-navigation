@@ -45,7 +45,7 @@ public class PlayerMoveListener {
         
         // Check if player is within collection radius
         if (activeWaypoint.isWithinRadius(x, y, z)) {
-            LOGGER.atInfo().log("[DEBUG] Player %s reached waypoint '%s' (within radius %.1f).",
+            LOGGER.atInfo().log("Player %s reached waypoint '%s' (within radius %.1f).",
                 playerUuid, activeWaypoint.getName(), activeWaypoint.getCollectionRadius());
             handleWaypointReached(playerData, activeWaypoint);
         }
@@ -62,12 +62,12 @@ public class PlayerMoveListener {
         // Mark as completed
         playerData.completeWaypoint(waypoint.getId());
         waypoint.setCompleted(true);
-        LOGGER.atInfo().log("[DEBUG] Waypoint '%s' (id=%s) marked as completed.", waypoint.getName(), waypoint.getId());
+        LOGGER.atInfo().log("Waypoint '%s' (id=%s) marked as completed.", waypoint.getName(), waypoint.getId());
         
         // Auto-progress to next waypoint if enabled
         if (plugin.getConfigManager().getBoolean("waypoint.autoProgress", true)) {
             boolean advanced = playerData.nextWaypoint();
-            LOGGER.atInfo().log("[DEBUG] Auto-progress enabled. Advanced to next waypoint: %s", advanced);
+            LOGGER.atInfo().log("Auto-progress enabled. Advanced to next waypoint: %s", advanced);
         }
         
         // Save player data

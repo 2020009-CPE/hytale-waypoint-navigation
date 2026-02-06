@@ -120,6 +120,6 @@ public class HUDRenderer {
      * Clears the HUD display.
      */
     public void clear() {
-        LOGGER.atInfo().log("[DEBUG] Clearing HUD display elements.");
+        LOGGER.atFine().log("[DEBUG] Clearing HUD display elements.");
     }
 }

@@ -13,14 +13,16 @@ repositories {
 }
 
 dependencies {
-    // Hytale API (version will be provided by the run-hytale plugin)
-    compileOnly("com.hypixel.hytale:hytale-api:+")
+    // Hytale API - Using local stub classes until official API is released
+    // The stub classes are located in src/main/java/com/hypixel/hytale/
+    // When the official Hytale API is available, remove the stubs and uncomment:
+    // compileOnly("com.hypixel.hytale:hytale-api:+")
     
     // JSON processing
     implementation("com.google.code.gson:gson:2.10.1")
     
-    // Annotations
-    compileOnly("javax.annotation:javax.annotation-api:1.3.2")
+    // Annotations (JSR-305 for @Nonnull, @Nullable, etc.)
+    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 }
 
 java {

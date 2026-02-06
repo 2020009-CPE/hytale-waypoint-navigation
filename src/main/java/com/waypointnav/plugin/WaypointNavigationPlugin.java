@@ -70,7 +70,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
      * Plugin setup method called during initialization.
      */
     @Override
-    protected void setup() {
+    public void setup() {
         LOGGER.atInfo().log("Initializing Waypoint Navigation Plugin...");
         
         // Initialize data folder
@@ -151,16 +151,6 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
     private void saveAllPlayerData() {
         // Note: Would iterate through online players using Hytale's player manager
         // and save their waypoint data
-    }
-    
-    /**
-     * Gets the plugin's data folder.
-     *
-     * @return The data folder path
-     */
-    @Nonnull
-    private Path getDataFolder() {
-        return super.getDataFolder().toPath();
     }
     
     // Getters for managers

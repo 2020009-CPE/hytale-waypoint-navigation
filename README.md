@@ -65,6 +65,7 @@ All commands use the `/waypoint` (or `/wp`) prefix:
 | `/waypoint toggle` | Toggle navigation on/off | `/waypoint toggle` |
 | `/waypoint toggle-hud` | Toggle HUD display | `/waypoint toggle-hud` |
 | `/waypoint toggle-world` | Toggle world markers | `/waypoint toggle-world` |
+| `/waypoint ui` | Open visual management panel | `/waypoint ui` |
 | `/waypoint help` | Show step-by-step admin guide | `/waypoint help` |
 
 ### Priority System
@@ -96,6 +97,19 @@ This saves your position with priority 0 and a 10-block collection radius.
 **Step 4:** Navigate! Follow the tall particle beacon and HUD arrow toward each waypoint. When you walk within the collection radius, the waypoint auto-completes and the system advances to the next priority waypoint.
 
 **Need help in-game?** Run `/waypoint help` for the full admin guide.
+
+## Visual UI Panel
+
+Run `/waypoint ui` to open an interactive management panel (requires `waypoint.admin` permission).
+
+The panel provides:
+- **Status display** — Shows the current navigation target and priority
+- **Add waypoint form** — Name, priority, and radius fields with an "Add Here" button
+- **Waypoint list** — All waypoints with priority, distance, and completion status
+- **Click to remove** — Click any waypoint in the list to remove it
+- **Action buttons** — Skip Current, Skip All, Clear All, and Close
+
+This is a native Hytale custom UI page (not chat-based). It uses `InteractiveCustomUIPage` with `.ui` layout files located in `Common/UI/Custom/WaypointNavigation/`.
 
 ## Installation
 
@@ -234,6 +248,8 @@ src/main/java/com/waypointnav/plugin/
 ├── rendering/
 │   ├── HUDRenderer.java             # HUD display rendering
 │   └── WorldRenderer.java           # World marker rendering
+├── ui/
+│   └── WaypointPage.java            # Interactive UI page handler
 ├── storage/
 │   ├── ConfigManager.java           # Configuration management
 │   └── WaypointStorage.java         # Data persistence

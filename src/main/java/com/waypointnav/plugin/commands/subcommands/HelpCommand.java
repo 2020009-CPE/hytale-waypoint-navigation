@@ -87,6 +87,7 @@ public class HelpCommand extends AbstractPlayerCommand {
         playerRef.sendMessage(Message.raw("  /waypoint toggle              - Toggle navigation on/off"));
         playerRef.sendMessage(Message.raw("  /waypoint toggle-hud          - Toggle HUD display"));
         playerRef.sendMessage(Message.raw("  /waypoint toggle-world        - Toggle world markers"));
+        playerRef.sendMessage(Message.raw("  /waypoint ui                  - Open visual management panel"));
         playerRef.sendMessage(Message.raw("  /waypoint help                - Show this guide"));
     }
 }

@@ -1,0 +1,202 @@
+// Waypoint Navigation - Main Management Panel
+// Opened via /waypoint ui (requires waypoint.admin permission)
+
+$C = "../Common.ui";
+
+// Custom button styles
+@PrimaryBtn = TextButtonStyle(
+  Default: (Background: #3a7bd5, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #4a8be5, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #2a6bc5, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+@DangerBtn = TextButtonStyle(
+  Default: (Background: #c0392b, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #e74c3c, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #a93226, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+@SecondBtn = TextButtonStyle(
+  Default: (Background: #2b3542, LabelStyle: (FontSize: 13, TextColor: #96a9be, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #3b4552, LabelStyle: (FontSize: 13, TextColor: #b6c9de, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #1b2532, LabelStyle: (FontSize: 13, TextColor: #96a9be, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+@SuccessBtn = TextButtonStyle(
+  Default: (Background: #27ae60, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #2ecc71, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #1e8449, LabelStyle: (FontSize: 13, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+Group {
+  Anchor: (Width: 520, Height: 520);
+  Background: #141c26(0.98);
+  LayoutMode: Top;
+  Padding: (Full: 16);
+
+  // ===== TITLE BAR =====
+  Label {
+    Text: "Waypoint Navigation";
+    Anchor: (Height: 36);
+    Style: (FontSize: 22, TextColor: #ffffff, HorizontalAlignment: Center, RenderBold: true);
+  }
+
+  // Subtitle - shows current status
+  Label #StatusLabel {
+    Text: "Loading...";
+    Anchor: (Height: 20);
+    Style: (FontSize: 12, TextColor: #96a9be, HorizontalAlignment: Center);
+  }
+
+  // Separator
+  Group { Anchor: (Height: 1); Background: #2b3542; }
+  Group { Anchor: (Height: 8); }
+
+  // ===== ADD WAYPOINT SECTION =====
+  Label {
+    Text: "Add Waypoint (at current position)";
+    Anchor: (Height: 22);
+    Style: (FontSize: 13, TextColor: #b4c8c9, RenderBold: true);
+  }
+
+  Group { Anchor: (Height: 4); }
+
+  // Name input row
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 38);
+
+    Label {
+      Text: "Name";
+      Anchor: (Width: 60);
+      Style: (FontSize: 12, TextColor: #96a9be, VerticalAlignment: Center);
+    }
+
+    $C.@TextField #NameInput {
+      FlexWeight: 1;
+      PlaceholderText: "Waypoint name...";
+    }
+  }
+
+  Group { Anchor: (Height: 4); }
+
+  // Priority and radius row
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 38);
+
+    Label {
+      Text: "Priority";
+      Anchor: (Width: 60);
+      Style: (FontSize: 12, TextColor: #96a9be, VerticalAlignment: Center);
+    }
+
+    $C.@NumberField #PriorityInput {
+      Anchor: (Width: 70);
+      Value: 0;
+    }
+
+    Group { Anchor: (Width: 16); }
+
+    Label {
+      Text: "Radius";
+      Anchor: (Width: 50);
+      Style: (FontSize: 12, TextColor: #96a9be, VerticalAlignment: Center);
+    }
+
+    $C.@NumberField #RadiusInput {
+      Anchor: (Width: 70);
+      Value: 5;
+    }
+
+    Group { Anchor: (Width: 16); }
+
+    TextButton #AddHereBtn {
+      Text: "Add Here";
+      Anchor: (Width: 110, Height: 36);
+      Style: @SuccessBtn;
+    }
+  }
+
+  Group { Anchor: (Height: 8); }
+
+  // Separator
+  Group { Anchor: (Height: 1); Background: #2b3542; }
+  Group { Anchor: (Height: 6); }
+
+  // ===== WAYPOINT LIST HEADER =====
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 22);
+
+    Label {
+      Text: "Your Waypoints";
+      Anchor: (Width: 200);
+      Style: (FontSize: 13, TextColor: #b4c8c9, RenderBold: true);
+    }
+
+    Group { FlexWeight: 1; }
+
+    Label #ProgressLabel {
+      Text: "0/0 completed";
+      Anchor: (Width: 140);
+      Style: (FontSize: 12, TextColor: #96a9be, HorizontalAlignment: End);
+    }
+  }
+
+  Group { Anchor: (Height: 4); }
+
+  // ===== SCROLLABLE WAYPOINT LIST =====
+  Group #WaypointList {
+    FlexWeight: 1;
+    LayoutMode: Top;
+    Background: #0d1218(0.6);
+    Padding: (Full: 6);
+  }
+
+  Group { Anchor: (Height: 8); }
+
+  // ===== ACTION BUTTONS =====
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 40);
+
+    TextButton #SkipBtn {
+      Text: "Skip Current";
+      Anchor: (Width: 110, Height: 36);
+      Style: @SecondBtn;
+    }
+
+    Group { Anchor: (Width: 8); }
+
+    TextButton #SkipAllBtn {
+      Text: "Skip All";
+      Anchor: (Width: 90, Height: 36);
+      Style: @SecondBtn;
+    }
+
+    Group { FlexWeight: 1; }
+
+    TextButton #ClearBtn {
+      Text: "Clear All";
+      Anchor: (Width: 90, Height: 36);
+      Style: @DangerBtn;
+    }
+
+    Group { Anchor: (Width: 8); }
+
+    TextButton #CloseBtn {
+      Text: "Close";
+      Anchor: (Width: 80, Height: 36);
+      Style: @SecondBtn;
+    }
+  }
+
+  // Footer hint
+  Group { Anchor: (Height: 4); }
+  Label {
+    Text: "Press ESC to close | Lower priority number = visited first";
+    Anchor: (Height: 14);
+    Style: (FontSize: 10, TextColor: #555555, HorizontalAlignment: Center);
+  }
+}

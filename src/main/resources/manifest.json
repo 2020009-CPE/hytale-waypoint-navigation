@@ -10,5 +10,5 @@
   "OptionalDependencies": {},
   "DisabledByDefault": false,
   "Main": "com.waypointnav.plugin.WaypointNavigationPlugin",
-  "IncludesAssetPack": false
+  "IncludesAssetPack": true
 }

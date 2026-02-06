@@ -66,6 +66,15 @@ public class PlayerDataManager {
     }
     
     /**
+     * Gets all player data entries.
+     *
+     * @return Unmodifiable collection of all player waypoint data
+     */
+    public java.util.Collection<PlayerWaypointData> getAllPlayerData() {
+        return java.util.Collections.unmodifiableCollection(playerData.values());
+    }
+
+    /**
      * Gets the number of players with data.
      *
      * @return The count of players

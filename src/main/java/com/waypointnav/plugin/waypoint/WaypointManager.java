@@ -2,18 +2,27 @@ package com.waypointnav.plugin.waypoint;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Central manager for all waypoints in the system.
  * Handles waypoint creation, deletion, and global waypoint operations.
+ *
+ * Supports a global waypoint list that is shared across all players.
+ * When an admin creates a waypoint, it is added to the global list and
+ * automatically synced to all online players.
  */
 public class WaypointManager {
     private final Map<UUID, Waypoint> waypoints;
     private final Map<String, List<UUID>> playerWaypoints;
-    
+
+    /** Global waypoint list shared across all players (for guided tours). */
+    private final List<Waypoint> globalWaypoints;
+
     public WaypointManager() {
         this.waypoints = new ConcurrentHashMap<>();
         this.playerWaypoints = new ConcurrentHashMap<>();
+        this.globalWaypoints = new CopyOnWriteArrayList<>();
     }
     
     /**
@@ -138,6 +147,73 @@ public class WaypointManager {
                     wp.setOrder(i);
                 }
             }
+        }
+    }
+
+    // ===== Global Waypoint Methods =====
+
+    /**
+     * Gets the global waypoint list.
+     *
+     * @return Unmodifiable list of global waypoints
+     */
+    public List<Waypoint> getGlobalWaypoints() {
+        return Collections.unmodifiableList(globalWaypoints);
+    }
+
+    /**
+     * Adds a waypoint to the global list.
+     *
+     * @param waypoint The waypoint to add globally
+     */
+    public void addGlobalWaypoint(Waypoint waypoint) {
+        waypoint.setOrder(globalWaypoints.size());
+        globalWaypoints.add(waypoint);
+        registerWaypoint(waypoint);
+    }
+
+    /**
+     * Removes a waypoint from the global list by index.
+     *
+     * @param index The index to remove
+     * @return The removed waypoint, or null if index is invalid
+     */
+    public Waypoint removeGlobalWaypoint(int index) {
+        if (index < 0 || index >= globalWaypoints.size()) {
+            return null;
+        }
+        Waypoint removed = globalWaypoints.remove(index);
+        if (removed != null) {
+            unregisterWaypoint(removed.getId());
+            // Reorder remaining global waypoints
+            for (int i = 0; i < globalWaypoints.size(); i++) {
+                globalWaypoints.get(i).setOrder(i);
+            }
+        }
+        return removed;
+    }
+
+    /**
+     * Clears all global waypoints.
+     */
+    public void clearGlobalWaypoints() {
+        for (Waypoint wp : globalWaypoints) {
+            unregisterWaypoint(wp.getId());
+        }
+        globalWaypoints.clear();
+    }
+
+    /**
+     * Sets the global waypoint list (used when loading from storage).
+     *
+     * @param waypoints The list of waypoints to set as global
+     */
+    public void setGlobalWaypoints(List<Waypoint> waypoints) {
+        globalWaypoints.clear();
+        for (Waypoint wp : waypoints) {
+            wp.setOrder(globalWaypoints.size());
+            globalWaypoints.add(wp);
+            registerWaypoint(wp);
         }
     }
 }

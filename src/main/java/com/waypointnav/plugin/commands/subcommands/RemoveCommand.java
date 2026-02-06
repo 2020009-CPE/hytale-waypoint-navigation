@@ -13,6 +13,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
+import com.waypointnav.plugin.utils.BroadcastUtils;
 import com.waypointnav.plugin.utils.MessageUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 /**
  * Command to remove a waypoint by index.
+ * In global mode, removes from all players.
  * Usage: /waypoint remove <index>
  */
 public class RemoveCommand extends AbstractPlayerCommand {
@@ -57,11 +59,28 @@ public class RemoveCommand extends AbstractPlayerCommand {
         }
         
         Waypoint waypoint = waypoints.get(index);
-        playerData.removeWaypoint(waypoint);
+        String removedName = waypoint.getName();
+        boolean isGlobalScope = !plugin.getConfigManager().getBoolean("playerScope", false);
         
-        // Save asynchronously
-        plugin.getStorage().savePlayerDataAsync(playerData);
-        
-        playerRef.sendMessage(Message.raw(MessageUtils.success("Removed waypoint: " + waypoint.getName())));
+        if (isGlobalScope) {
+            // Remove from global list and all players
+            plugin.getWaypointManager().removeGlobalWaypoint(index);
+            plugin.getStorage().saveGlobalWaypointsAsync(plugin.getWaypointManager().getGlobalWaypoints());
+            
+            for (PlayerWaypointData pd : plugin.getPlayerDataManager().getAllPlayerData()) {
+                List<Waypoint> pdWaypoints = pd.getWaypoints();
+                if (index < pdWaypoints.size()) {
+                    pd.removeWaypoint(pdWaypoints.get(index));
+                    plugin.getStorage().savePlayerDataAsync(pd);
+                }
+            }
+            
+            BroadcastUtils.broadcastWaypointRemoved(removedName);
+            playerRef.sendMessage(Message.raw(MessageUtils.success("Removed waypoint: " + removedName + " (all players)")));
+        } else {
+            playerData.removeWaypoint(waypoint);
+            plugin.getStorage().savePlayerDataAsync(playerData);
+            playerRef.sendMessage(Message.raw(MessageUtils.success("Removed waypoint: " + removedName)));
+        }
     }
 }

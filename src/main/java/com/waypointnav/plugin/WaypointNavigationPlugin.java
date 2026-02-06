@@ -86,7 +86,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         // Initialize renderers
         this.hudRenderer = new HUDRenderer();
         this.worldRenderer = new WorldRenderer();
-        LOGGER.info("Renderers initialized (HUD + World markers).");
+        LOGGER.info("Renderers initialized (HUD + Beacon overlay).");
         
         // Load configuration
         configManager.load();
@@ -95,6 +95,12 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         // Initialize storage
         storage.initialize();
         LOGGER.info("Storage system initialized.");
+        
+        // Load global waypoints
+        storage.loadGlobalWaypointsAsync().thenAccept(globalWaypoints -> {
+            waypointManager.setGlobalWaypoints(globalWaypoints);
+            LOGGER.info(String.format("Loaded %d global waypoint(s).", globalWaypoints.size()));
+        });
         
         // Register commands
         registerCommands();
@@ -108,6 +114,8 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         startUpdateTasks();
         LOGGER.info("Update tasks started.");
         
+        boolean isGlobalScope = !configManager.getBoolean("playerScope", false);
+        LOGGER.info(String.format("Waypoint scope: %s", isGlobalScope ? "GLOBAL (all players)" : "PER-PLAYER"));
         LOGGER.info("Waypoint Navigation Plugin enabled!");
     }
     
@@ -120,8 +128,14 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         // Save all player data
         saveAllPlayerData();
         
+        // Save global waypoints
+        storage.saveGlobalWaypointsAsync(waypointManager.getGlobalWaypoints());
+        
         // Save configuration
         configManager.save();
+        
+        // Close all beacon overlays
+        worldRenderer.clear();
         
         LOGGER.info("Waypoint Navigation Plugin disabled!");
     }

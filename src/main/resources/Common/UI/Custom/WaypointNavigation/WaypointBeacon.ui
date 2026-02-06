@@ -1,0 +1,55 @@
+// Waypoint Navigation - Beacon Overlay HUD
+// Persistent overlay showing active waypoint direction, distance, and name.
+// Managed by WaypointBeaconPage.java — opened automatically when navigation is active.
+
+$C = "../Common.ui";
+
+Group {
+  Anchor: (Width: 260, Height: 70);
+  Background: #0d1218(0.75);
+  LayoutMode: Top;
+  Padding: (Full: 8);
+  HorizontalAlignment: Center;
+  VerticalAlignment: Start;
+  Margin: (Top: 12);
+
+  // Waypoint name
+  Label #BeaconName {
+    Text: "Waypoint";
+    Anchor: (Height: 20);
+    Style: (FontSize: 14, TextColor: #3adf75, RenderBold: true, HorizontalAlignment: Center);
+  }
+
+  // Direction arrow + distance row
+  Group {
+    LayoutMode: Left;
+    Anchor: (Height: 24);
+
+    Group { FlexWeight: 1; }
+
+    // Direction arrow indicator
+    Label #BeaconArrow {
+      Text: ">>>";
+      Anchor: (Width: 50);
+      Style: (FontSize: 16, TextColor: #ffcc00, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+    }
+
+    Group { Anchor: (Width: 8); }
+
+    // Distance display
+    Label #BeaconDistance {
+      Text: "0.0m";
+      Anchor: (Width: 80);
+      Style: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center);
+    }
+
+    Group { FlexWeight: 1; }
+  }
+
+  // Coordinates display
+  Label #BeaconCoords {
+    Text: "(0, 0, 0)";
+    Anchor: (Height: 14);
+    Style: (FontSize: 10, TextColor: #96a9be, HorizontalAlignment: Center);
+  }
+}

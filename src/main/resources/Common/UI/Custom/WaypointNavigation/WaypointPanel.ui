@@ -91,9 +91,9 @@ Group {
       Style: (FontSize: 12, TextColor: #96a9be, VerticalAlignment: Center);
     }
 
-    $C.@NumberField #PriorityInput {
+    $C.@TextField #PriorityInput {
       Anchor: (Width: 70);
-      Value: 0;
+      PlaceholderText: "0";
     }
 
     Group { Anchor: (Width: 16); }
@@ -104,9 +104,9 @@ Group {
       Style: (FontSize: 12, TextColor: #96a9be, VerticalAlignment: Center);
     }
 
-    $C.@NumberField #RadiusInput {
+    $C.@TextField #RadiusInput {
       Anchor: (Width: 70);
-      Value: 5;
+      PlaceholderText: "5";
     }
 
     Group { Anchor: (Width: 16); }

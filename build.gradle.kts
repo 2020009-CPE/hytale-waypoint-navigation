@@ -22,7 +22,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     
     // Annotations (JSR-305 for @Nonnull, @Nullable, etc.)
-    implementation("com.google.code.findbugs:jsr305:3.0.2")
+    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 }
 
 java {

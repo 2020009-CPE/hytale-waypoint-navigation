@@ -1,6 +1,7 @@
 package com.hypixel.hytale.plugin;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Stub class for Hytale API - JavaPlugin
@@ -10,7 +11,8 @@ public abstract class JavaPlugin {
     private Path dataFolder;
     
     public JavaPlugin(JavaPluginInit init) {
-        this.dataFolder = Path.of("plugins/WaypointNavigation");
+        // Default to plugins directory - subclasses can customize via getDataFolder override
+        this.dataFolder = Paths.get("plugins", this.getClass().getSimpleName());
     }
     
     public abstract void setup();

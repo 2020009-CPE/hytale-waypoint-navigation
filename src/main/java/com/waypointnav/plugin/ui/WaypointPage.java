@@ -17,7 +17,6 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.NotificationUtil;
-import com.hypixel.hytale.logger.HytaleLogger;
 
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
@@ -28,6 +27,7 @@ import com.waypointnav.plugin.waypoint.WaypointType;
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Interactive UI page for the Waypoint Navigation panel.
@@ -44,7 +44,7 @@ import java.util.UUID;
  */
 public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointEventData> {
 
-    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    private static final Logger LOGGER = Logger.getLogger(WaypointPage.class.getName());
     public static final String LAYOUT = "WaypointNavigation/WaypointPanel.ui";
     public static final String LIST_ITEM = "WaypointNavigation/WaypointListItem.ui";
     private static final String REMOVE_ACTION_PREFIX = "removeWaypoint:";
@@ -66,7 +66,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
             @Nonnull UIEventBuilder evt,
             @Nonnull Store<EntityStore> store
     ) {
-        LOGGER.info("Building waypoint UI for player %s", playerRef.getUuid());
+        LOGGER.info(String.format("Building waypoint UI for player %s", playerRef.getUuid()));
 
         // Load the main panel layout
         cmd.append(LAYOUT);
@@ -184,13 +184,13 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
 
         String action = data.action != null ? data.action : "";
 
-        LOGGER.info("Waypoint UI event: action=%s, name=%s",
-            data.action, data.wpName);
+        LOGGER.info(String.format("Waypoint UI event: action=%s, name=%s",
+            data.action, data.wpName));
 
         if (action.startsWith(REMOVE_ACTION_PREFIX)) {
             int index = parseIntSafe(action.substring(REMOVE_ACTION_PREFIX.length()), -1);
             if (index < 0) {
-                LOGGER.info("Invalid remove waypoint index in action: %s", action);
+                LOGGER.info(String.format("Invalid remove waypoint index in action: %s", action));
                 sendUpdate();
                 return;
             }
@@ -217,7 +217,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
                 return;
 
             default:
-                LOGGER.info("Unknown UI action: %s", data.action);
+                LOGGER.info(String.format("Unknown UI action: %s", data.action));
                 return;
         }
 

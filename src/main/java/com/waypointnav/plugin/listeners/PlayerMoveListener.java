@@ -1,9 +1,10 @@
 package com.waypointnav.plugin.listeners;
 
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.waypoint.Waypoint;
+
+import java.util.logging.Logger;
 
 /**
  * Handles player movement to check waypoint completion.
@@ -13,7 +14,7 @@ import com.waypointnav.plugin.waypoint.Waypoint;
  * check player positions against active waypoints.
  */
 public class PlayerMoveListener {
-    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    private static final Logger LOGGER = Logger.getLogger(PlayerMoveListener.class.getName());
     private final WaypointNavigationPlugin plugin;
     
     public PlayerMoveListener(WaypointNavigationPlugin plugin) {
@@ -45,8 +46,8 @@ public class PlayerMoveListener {
         
         // Check if player is within collection radius
         if (activeWaypoint.isWithinRadius(x, y, z)) {
-            LOGGER.info("Player %s reached waypoint '%s' (within radius %.1f).",
-                playerUuid, activeWaypoint.getName(), activeWaypoint.getCollectionRadius());
+            LOGGER.info(String.format("Player %s reached waypoint '%s' (within radius %.1f).",
+                playerUuid, activeWaypoint.getName(), activeWaypoint.getCollectionRadius()));
             handleWaypointReached(playerData, activeWaypoint);
         }
     }
@@ -62,12 +63,12 @@ public class PlayerMoveListener {
         // Mark as completed
         playerData.completeWaypoint(waypoint.getId());
         waypoint.setCompleted(true);
-        LOGGER.info("Waypoint '%s' (id=%s) marked as completed.", waypoint.getName(), waypoint.getId());
+        LOGGER.info(String.format("Waypoint '%s' (id=%s) marked as completed.", waypoint.getName(), waypoint.getId()));
         
         // Auto-progress to next waypoint if enabled
         if (plugin.getConfigManager().getBoolean("waypoint.autoProgress", true)) {
             boolean advanced = playerData.nextWaypoint();
-            LOGGER.info("Auto-progress enabled. Advanced to next waypoint: %s", advanced);
+            LOGGER.info(String.format("Auto-progress enabled. Advanced to next waypoint: %s", advanced));
         }
         
         // Save player data

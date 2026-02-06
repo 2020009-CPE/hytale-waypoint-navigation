@@ -1,6 +1,5 @@
 package com.waypointnav.plugin;
 
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
@@ -24,13 +23,14 @@ import com.waypointnav.plugin.waypoint.WaypointType;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Main plugin class for the Waypoint Navigation system.
  * Manages all plugin components and provides the public API.
  */
 public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI {
-    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+    private static final Logger LOGGER = Logger.getLogger(WaypointNavigationPlugin.class.getName());
     
     private WaypointManager waypointManager;
     private PlayerDataManager playerDataManager;
@@ -74,7 +74,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         
         // Initialize data folder
         Path dataFolder = getDataDirectory();
-        LOGGER.info("Data directory: %s", dataFolder);
+        LOGGER.info(String.format("Data directory: %s", dataFolder));
         
         // Initialize managers
         this.waypointManager = new WaypointManager();

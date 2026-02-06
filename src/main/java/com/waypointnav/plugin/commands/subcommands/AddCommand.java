@@ -14,6 +14,7 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
+import com.waypointnav.plugin.utils.BroadcastUtils;
 import com.waypointnav.plugin.utils.MessageUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
 import com.waypointnav.plugin.waypoint.WaypointType;
@@ -95,8 +96,27 @@ public class AddCommand extends AbstractPlayerCommand {
             waypoint.setCollectionRadius(radius);
             waypoint.setPriority(priority);
             
-            playerData.addWaypoint(waypoint);
-            plugin.getStorage().savePlayerDataAsync(playerData);
+            boolean isGlobalScope = !plugin.getConfigManager().getBoolean("playerScope", false);
+            
+            if (isGlobalScope) {
+                // Global mode: add to global list and all online players
+                plugin.getWaypointManager().addGlobalWaypoint(waypoint);
+                plugin.getStorage().saveGlobalWaypointsAsync(plugin.getWaypointManager().getGlobalWaypoints());
+                
+                for (PlayerWaypointData pd : plugin.getPlayerDataManager().getAllPlayerData()) {
+                    Waypoint copy = new Waypoint(name, position.getX(), position.getY(), position.getZ(),
+                                                 WaypointType.USER_DEFINED);
+                    copy.setCollectionRadius(radius);
+                    copy.setPriority(priority);
+                    pd.addWaypoint(copy);
+                    plugin.getStorage().savePlayerDataAsync(pd);
+                }
+                
+                BroadcastUtils.broadcastWaypointAdded(name, position.getX(), position.getY(), position.getZ());
+            } else {
+                playerData.addWaypoint(waypoint);
+                plugin.getStorage().savePlayerDataAsync(playerData);
+            }
             
             playerRef.sendMessage(Message.raw(MessageUtils.success("Added waypoint: " + name)));
             playerRef.sendMessage(Message.raw(MessageUtils.info(
@@ -138,8 +158,25 @@ public class AddCommand extends AbstractPlayerCommand {
             waypoint.setCollectionRadius(radius);
             waypoint.setPriority(priority);
             
-            playerData.addWaypoint(waypoint);
-            plugin.getStorage().savePlayerDataAsync(playerData);
+            boolean isGlobalScope = !plugin.getConfigManager().getBoolean("playerScope", false);
+            
+            if (isGlobalScope) {
+                plugin.getWaypointManager().addGlobalWaypoint(waypoint);
+                plugin.getStorage().saveGlobalWaypointsAsync(plugin.getWaypointManager().getGlobalWaypoints());
+                
+                for (PlayerWaypointData pd : plugin.getPlayerDataManager().getAllPlayerData()) {
+                    Waypoint copy = new Waypoint(name, x, y, z, WaypointType.BLOCK_COORDINATES);
+                    copy.setCollectionRadius(radius);
+                    copy.setPriority(priority);
+                    pd.addWaypoint(copy);
+                    plugin.getStorage().savePlayerDataAsync(pd);
+                }
+                
+                BroadcastUtils.broadcastWaypointAdded(name, x, y, z);
+            } else {
+                playerData.addWaypoint(waypoint);
+                plugin.getStorage().savePlayerDataAsync(playerData);
+            }
             
             playerRef.sendMessage(Message.raw(MessageUtils.success("Added waypoint: " + name)));
             playerRef.sendMessage(Message.raw(MessageUtils.info(

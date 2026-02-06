@@ -10,6 +10,7 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,13 +19,16 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Handles asynchronous saving and loading of waypoint data to/from JSON files.
+ * Supports both per-player data and global shared waypoints.
  */
 public class WaypointStorage {
     private final Path dataFolder;
+    private final Path globalWaypointsFile;
     private final Gson gson;
     
     public WaypointStorage(Path dataFolder) {
         this.dataFolder = dataFolder.resolve("playerdata");
+        this.globalWaypointsFile = dataFolder.resolve("global_waypoints.json");
         this.gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
@@ -222,6 +226,77 @@ public class WaypointStorage {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    // ===== Global Waypoint Storage =====
+
+    /**
+     * Saves global waypoints to file asynchronously.
+     *
+     * @param waypoints The list of global waypoints to save
+     * @return CompletableFuture that completes when save is done
+     */
+    public CompletableFuture<Void> saveGlobalWaypointsAsync(List<Waypoint> waypoints) {
+        return CompletableFuture.runAsync(() -> saveGlobalWaypoints(waypoints));
+    }
+
+    /**
+     * Saves global waypoints to file synchronously.
+     *
+     * @param waypoints The list of global waypoints to save
+     */
+    private void saveGlobalWaypoints(List<Waypoint> waypoints) {
+        try {
+            Files.createDirectories(globalWaypointsFile.getParent());
+            try (Writer writer = Files.newBufferedWriter(globalWaypointsFile)) {
+                gson.toJson(waypoints, writer);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Loads global waypoints from file asynchronously.
+     *
+     * @return CompletableFuture containing the list of global waypoints
+     */
+    public CompletableFuture<List<Waypoint>> loadGlobalWaypointsAsync() {
+        return CompletableFuture.supplyAsync(this::loadGlobalWaypoints);
+    }
+
+    /**
+     * Loads global waypoints from file synchronously.
+     *
+     * @return List of global waypoints, or empty list if file not found
+     */
+    @SuppressWarnings("unchecked")
+    private List<Waypoint> loadGlobalWaypoints() {
+        if (!Files.exists(globalWaypointsFile)) {
+            return new ArrayList<>();
+        }
+
+        try (Reader reader = Files.newBufferedReader(globalWaypointsFile)) {
+            Type listType = new TypeToken<List<Map<String, Object>>>(){}.getType();
+            List<Map<String, Object>> waypointMaps = gson.fromJson(reader, listType);
+
+            if (waypointMaps == null) {
+                return new ArrayList<>();
+            }
+
+            List<Waypoint> result = new ArrayList<>();
+            for (Map<String, Object> wpMap : waypointMaps) {
+                Waypoint waypoint = deserializeWaypoint(wpMap);
+                if (waypoint != null) {
+                    result.add(waypoint);
+                }
+            }
+            return result;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 }

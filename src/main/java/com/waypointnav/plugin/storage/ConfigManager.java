@@ -76,9 +76,9 @@ public class ConfigManager {
         // World marker settings
         Map<String, Object> worldSettings = new HashMap<>();
         worldSettings.put("enabled", true);
-        worldSettings.put("particleType", "FLAME");
-        worldSettings.put("particleCount", 20);
-        worldSettings.put("updateInterval", 2); // ticks
+        worldSettings.put("beaconOverlay", true);
+        worldSettings.put("markerIcon", "default");
+        worldSettings.put("updateInterval", 10); // ticks
         config.put("world", worldSettings);
         
         // Waypoint settings
@@ -89,8 +89,8 @@ public class ConfigManager {
         waypointSettings.put("maxWaypoints", 50);
         config.put("waypoint", waypointSettings);
         
-        // Player scope settings
-        config.put("playerScope", true); // true = per-player, false = global
+        // Player scope settings — false = global (all players share waypoints)
+        config.put("playerScope", false);
         
         // Navigation settings
         Map<String, Object> navSettings = new HashMap<>();

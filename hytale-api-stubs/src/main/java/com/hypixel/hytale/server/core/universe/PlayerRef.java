@@ -26,4 +26,8 @@ public class PlayerRef {
     public Object getPacketHandler() {
         return null;
     }
+
+    public UUID getWorldUuid() {
+        return null;
+    }
 }

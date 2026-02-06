@@ -11,17 +11,19 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
+import com.waypointnav.plugin.utils.BroadcastUtils;
 import com.waypointnav.plugin.utils.MessageUtils;
 import java.util.UUID;
 
 /**
- * Command to clear all waypoints for a player.
+ * Command to clear all waypoints.
+ * In global mode, clears waypoints for all players.
  * Usage: /waypoint clear
  */
 public class ClearCommand extends AbstractPlayerCommand {
     
     public ClearCommand() {
-        super("clear", "Clear all your waypoints");
+        super("clear", "Clear all waypoints");
     }
     
     @Override
@@ -42,11 +44,24 @@ public class ClearCommand extends AbstractPlayerCommand {
         }
         
         int count = playerData.getWaypoints().size();
-        playerData.clearWaypoints();
+        boolean isGlobalScope = !plugin.getConfigManager().getBoolean("playerScope", false);
         
-        // Save asynchronously
-        plugin.getStorage().savePlayerDataAsync(playerData);
-        
-        playerRef.sendMessage(Message.raw(MessageUtils.success("Cleared " + count + " waypoint(s)!")));
+        if (isGlobalScope) {
+            // Clear global list and all players
+            plugin.getWaypointManager().clearGlobalWaypoints();
+            plugin.getStorage().saveGlobalWaypointsAsync(plugin.getWaypointManager().getGlobalWaypoints());
+            
+            for (PlayerWaypointData pd : plugin.getPlayerDataManager().getAllPlayerData()) {
+                pd.clearWaypoints();
+                plugin.getStorage().savePlayerDataAsync(pd);
+            }
+            
+            BroadcastUtils.broadcastWaypointsCleared(count);
+            playerRef.sendMessage(Message.raw(MessageUtils.success("Cleared " + count + " waypoint(s) for all players!")));
+        } else {
+            playerData.clearWaypoints();
+            plugin.getStorage().savePlayerDataAsync(playerData);
+            playerRef.sendMessage(Message.raw(MessageUtils.success("Cleared " + count + " waypoint(s)!")));
+        }
     }
 }

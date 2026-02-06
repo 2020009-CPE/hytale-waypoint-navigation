@@ -20,6 +20,7 @@ import com.hypixel.hytale.server.core.util.NotificationUtil;
 
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
+import com.waypointnav.plugin.utils.BroadcastUtils;
 import com.waypointnav.plugin.utils.MathUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
 import com.waypointnav.plugin.waypoint.WaypointType;
@@ -38,6 +39,9 @@ import java.util.logging.Logger;
  * - Remove individual waypoints by clicking them
  * - Skip current/all waypoints
  * - Clear all waypoints
+ *
+ * When playerScope is false (global mode), waypoint add/remove/clear operations
+ * are broadcast to all online players, enabling guided tour functionality.
  *
  * Layout file: Common/UI/Custom/WaypointNavigation/WaypointPanel.ui
  * List item template: Common/UI/Custom/WaypointNavigation/WaypointListItem.ui
@@ -227,6 +231,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
 
     /**
      * Handles the "Add Here" button — creates a waypoint at the player's position.
+     * In global mode (playerScope=false), the waypoint is added to all online players.
      */
     private void handleAddHere(WaypointNavigationPlugin plugin,
                                 PlayerWaypointData playerData) {
@@ -249,24 +254,59 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
         }
 
         Vector3d position = new Vector3d(playerRef.getTransform().getPosition());
-        Waypoint waypoint = new Waypoint(name, position.getX(), position.getY(), position.getZ(),
-                                         WaypointType.USER_DEFINED);
-        waypoint.setCollectionRadius(radius);
-        waypoint.setPriority(priority);
 
-        playerData.addWaypoint(waypoint);
-        plugin.getStorage().savePlayerDataAsync(playerData);
+        boolean isGlobalScope = !plugin.getConfigManager().getBoolean("playerScope", false);
 
-        NotificationUtil.sendNotification(
-            playerRef.getPacketHandler(),
-            Message.raw("Waypoint Added"),
-            Message.raw("Added '" + name + "' (P:" + priority + ", R:" + radius + ")"),
-            NotificationStyle.Success
-        );
+        if (isGlobalScope) {
+            // Global mode: add to global list and broadcast to all online players
+            Waypoint globalWp = new Waypoint(name, position.getX(), position.getY(), position.getZ(),
+                                             WaypointType.USER_DEFINED);
+            globalWp.setCollectionRadius(radius);
+            globalWp.setPriority(priority);
+            plugin.getWaypointManager().addGlobalWaypoint(globalWp);
+            plugin.getStorage().saveGlobalWaypointsAsync(plugin.getWaypointManager().getGlobalWaypoints());
+
+            // Add a copy to every online player
+            for (PlayerWaypointData pd : plugin.getPlayerDataManager().getAllPlayerData()) {
+                Waypoint copy = new Waypoint(name, position.getX(), position.getY(), position.getZ(),
+                                             WaypointType.USER_DEFINED);
+                copy.setCollectionRadius(radius);
+                copy.setPriority(priority);
+                pd.addWaypoint(copy);
+                plugin.getStorage().savePlayerDataAsync(pd);
+            }
+
+            NotificationUtil.sendNotification(
+                playerRef.getPacketHandler(),
+                Message.raw("Global Waypoint Added"),
+                Message.raw("Added '" + name + "' for all players (P:" + priority + ", R:" + radius + ")"),
+                NotificationStyle.Success
+            );
+
+            // Broadcast to all players
+            BroadcastUtils.broadcastWaypointAdded(name, position.getX(), position.getY(), position.getZ());
+        } else {
+            // Per-player mode: add only to the admin's list
+            Waypoint waypoint = new Waypoint(name, position.getX(), position.getY(), position.getZ(),
+                                             WaypointType.USER_DEFINED);
+            waypoint.setCollectionRadius(radius);
+            waypoint.setPriority(priority);
+
+            playerData.addWaypoint(waypoint);
+            plugin.getStorage().savePlayerDataAsync(playerData);
+
+            NotificationUtil.sendNotification(
+                playerRef.getPacketHandler(),
+                Message.raw("Waypoint Added"),
+                Message.raw("Added '" + name + "' (P:" + priority + ", R:" + radius + ")"),
+                NotificationStyle.Success
+            );
+        }
     }
 
     /**
      * Handles removing a waypoint by list index.
+     * In global mode, removes the waypoint from all online players.
      */
     private void handleRemoveWaypoint(WaypointNavigationPlugin plugin,
                                        PlayerWaypointData playerData,
@@ -279,15 +319,43 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
 
         Waypoint wp = waypoints.get(index);
         String removedName = wp.getName();
-        playerData.removeWaypoint(wp);
-        plugin.getStorage().savePlayerDataAsync(playerData);
 
-        NotificationUtil.sendNotification(
-            playerRef.getPacketHandler(),
-            Message.raw("Waypoint Removed"),
-            Message.raw("Removed '" + removedName + "'"),
-            NotificationStyle.Default
-        );
+        boolean isGlobalScope = !plugin.getConfigManager().getBoolean("playerScope", false);
+
+        if (isGlobalScope) {
+            // Remove from global list
+            plugin.getWaypointManager().removeGlobalWaypoint(index);
+            plugin.getStorage().saveGlobalWaypointsAsync(plugin.getWaypointManager().getGlobalWaypoints());
+
+            // Remove from all online players by index
+            for (PlayerWaypointData pd : plugin.getPlayerDataManager().getAllPlayerData()) {
+                List<Waypoint> pdWaypoints = pd.getWaypoints();
+                if (index < pdWaypoints.size()) {
+                    pd.removeWaypoint(pdWaypoints.get(index));
+                    plugin.getStorage().savePlayerDataAsync(pd);
+                }
+            }
+
+            NotificationUtil.sendNotification(
+                playerRef.getPacketHandler(),
+                Message.raw("Global Waypoint Removed"),
+                Message.raw("Removed '" + removedName + "' from all players"),
+                NotificationStyle.Default
+            );
+
+            // Broadcast to all players
+            BroadcastUtils.broadcastWaypointRemoved(removedName);
+        } else {
+            playerData.removeWaypoint(wp);
+            plugin.getStorage().savePlayerDataAsync(playerData);
+
+            NotificationUtil.sendNotification(
+                playerRef.getPacketHandler(),
+                Message.raw("Waypoint Removed"),
+                Message.raw("Removed '" + removedName + "'"),
+                NotificationStyle.Default
+            );
+        }
     }
 
     /**
@@ -345,6 +413,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
 
     /**
      * Handles clearing all waypoints.
+     * In global mode, clears waypoints for all online players.
      */
     private void handleClear(WaypointNavigationPlugin plugin, PlayerWaypointData playerData) {
         int count = playerData.getWaypoints().size();
@@ -358,15 +427,39 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
             return;
         }
 
-        playerData.clearWaypoints();
-        plugin.getStorage().savePlayerDataAsync(playerData);
+        boolean isGlobalScope = !plugin.getConfigManager().getBoolean("playerScope", false);
 
-        NotificationUtil.sendNotification(
-            playerRef.getPacketHandler(),
-            Message.raw("Waypoints Cleared"),
-            Message.raw("Cleared " + count + " waypoint(s)."),
-            NotificationStyle.Success
-        );
+        if (isGlobalScope) {
+            // Clear global list
+            plugin.getWaypointManager().clearGlobalWaypoints();
+            plugin.getStorage().saveGlobalWaypointsAsync(plugin.getWaypointManager().getGlobalWaypoints());
+
+            // Clear all online players
+            for (PlayerWaypointData pd : plugin.getPlayerDataManager().getAllPlayerData()) {
+                pd.clearWaypoints();
+                plugin.getStorage().savePlayerDataAsync(pd);
+            }
+
+            NotificationUtil.sendNotification(
+                playerRef.getPacketHandler(),
+                Message.raw("Global Waypoints Cleared"),
+                Message.raw("Cleared " + count + " waypoint(s) for all players."),
+                NotificationStyle.Success
+            );
+
+            // Broadcast to all players
+            BroadcastUtils.broadcastWaypointsCleared(count);
+        } else {
+            playerData.clearWaypoints();
+            plugin.getStorage().savePlayerDataAsync(playerData);
+
+            NotificationUtil.sendNotification(
+                playerRef.getPacketHandler(),
+                Message.raw("Waypoints Cleared"),
+                Message.raw("Cleared " + count + " waypoint(s)."),
+                NotificationStyle.Success
+            );
+        }
     }
 
     /**

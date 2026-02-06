@@ -28,12 +28,6 @@ public class HelpCommand extends AbstractPlayerCommand {
                          PlayerRef playerRef,
                          World world) {
         
-        // Permission check
-        if (!playerRef.hasPermission("waypoint.admin")) {
-            playerRef.sendMessage(Message.raw(MessageUtils.error("You need the 'waypoint.admin' permission!")));
-            return;
-        }
-        
         playerRef.sendMessage(Message.raw(MessageUtils.header("Waypoint Navigation - Admin Guide")));
         playerRef.sendMessage(Message.raw(""));
         playerRef.sendMessage(Message.raw(MessageUtils.plain("All commands require 'waypoint.admin' permission.")));

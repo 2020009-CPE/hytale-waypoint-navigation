@@ -16,10 +16,6 @@ public class PlayerRef {
         return null;
     }
 
-    public boolean hasPermission(String permission) {
-        return false;
-    }
-
     public void sendMessage(Message message) {
     }
 

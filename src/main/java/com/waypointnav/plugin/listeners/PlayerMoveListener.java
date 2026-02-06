@@ -4,11 +4,9 @@ import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.waypoint.Waypoint;
 
-import javax.annotation.Nonnull;
-
 /**
  * Handles player movement to check waypoint completion.
- * 
+ *
  * Note: Since Hytale may not have a direct PlayerMoveEvent, this functionality
  * should be implemented using a tick system or World.execute() to periodically
  * check player positions against active waypoints.
@@ -16,7 +14,7 @@ import javax.annotation.Nonnull;
 public class PlayerMoveListener {
     private final WaypointNavigationPlugin plugin;
     
-    public PlayerMoveListener(@Nonnull WaypointNavigationPlugin plugin) {
+    public PlayerMoveListener(WaypointNavigationPlugin plugin) {
         this.plugin = plugin;
     }
     
@@ -29,7 +27,7 @@ public class PlayerMoveListener {
      * @param y Player's Y position
      * @param z Player's Z position
      */
-    public void checkWaypointReached(@Nonnull java.util.UUID playerUuid, 
+    public void checkWaypointReached(java.util.UUID playerUuid, 
                                     double x, double y, double z) {
         // Get player data
         PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
@@ -55,8 +53,8 @@ public class PlayerMoveListener {
      * @param playerData The player's waypoint data
      * @param waypoint The completed waypoint
      */
-    private void handleWaypointReached(@Nonnull PlayerWaypointData playerData,
-                                       @Nonnull Waypoint waypoint) {
+    private void handleWaypointReached(PlayerWaypointData playerData,
+                                       Waypoint waypoint) {
         // Mark as completed
         playerData.completeWaypoint(waypoint.getId());
         waypoint.setCompleted(true);

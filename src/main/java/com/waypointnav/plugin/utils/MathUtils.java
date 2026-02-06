@@ -1,7 +1,4 @@
 package com.waypointnav.plugin.utils;
-
-import javax.annotation.Nonnull;
-
 /**
  * Utility class for mathematical calculations used in waypoint navigation.
  */
@@ -51,7 +48,7 @@ public class MathUtils {
      * @param targetZ Target Z coordinate
      * @return Array containing normalized direction vector [x, y, z]
      */
-    @Nonnull
+
     public static double[] directionVector(double srcX, double srcY, double srcZ,
                                           double targetX, double targetY, double targetZ) {
         double dx = targetX - srcX;
@@ -144,7 +141,7 @@ public class MathUtils {
      * @param distance The distance in blocks
      * @return Formatted distance string
      */
-    @Nonnull
+
     public static String formatDistance(double distance) {
         if (distance < 1000) {
             return String.format("%.1fm", distance);

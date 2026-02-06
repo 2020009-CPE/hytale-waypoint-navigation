@@ -4,8 +4,6 @@ import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.waypoint.Waypoint;
 import com.waypointnav.plugin.waypoint.WaypointType;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,9 +24,9 @@ public interface WaypointAPI {
      * @param type The waypoint type
      * @return The created waypoint
      */
-    @Nonnull
-    Waypoint createWaypoint(@Nonnull UUID playerUuid, @Nonnull String name,
-                           double x, double y, double z, @Nonnull WaypointType type);
+
+    Waypoint createWaypoint(UUID playerUuid, String name,
+                           double x, double y, double z, WaypointType type);
     
     /**
      * Creates a waypoint with custom collection radius.
@@ -42,10 +40,10 @@ public interface WaypointAPI {
      * @param radius Collection radius
      * @return The created waypoint
      */
-    @Nonnull
-    Waypoint createWaypoint(@Nonnull UUID playerUuid, @Nonnull String name,
+
+    Waypoint createWaypoint(UUID playerUuid, String name,
                            double x, double y, double z, 
-                           @Nonnull WaypointType type, double radius);
+                           WaypointType type, double radius);
     
     /**
      * Removes a waypoint for a player.
@@ -54,7 +52,7 @@ public interface WaypointAPI {
      * @param waypointId The waypoint ID to remove
      * @return true if removed successfully
      */
-    boolean removeWaypoint(@Nonnull UUID playerUuid, @Nonnull UUID waypointId);
+    boolean removeWaypoint(UUID playerUuid, UUID waypointId);
     
     /**
      * Gets all waypoints for a player.
@@ -62,8 +60,8 @@ public interface WaypointAPI {
      * @param playerUuid The player's UUID
      * @return List of waypoints
      */
-    @Nonnull
-    List<Waypoint> getPlayerWaypoints(@Nonnull UUID playerUuid);
+
+    List<Waypoint> getPlayerWaypoints(UUID playerUuid);
     
     /**
      * Gets the active waypoint for a player.
@@ -71,8 +69,8 @@ public interface WaypointAPI {
      * @param playerUuid The player's UUID
      * @return The active waypoint, or null if none
      */
-    @Nullable
-    Waypoint getActiveWaypoint(@Nonnull UUID playerUuid);
+
+    Waypoint getActiveWaypoint(UUID playerUuid);
     
     /**
      * Sets the active waypoint by index.
@@ -81,7 +79,7 @@ public interface WaypointAPI {
      * @param index The waypoint index
      * @return true if set successfully
      */
-    boolean setActiveWaypoint(@Nonnull UUID playerUuid, int index);
+    boolean setActiveWaypoint(UUID playerUuid, int index);
     
     /**
      * Advances to the next waypoint.
@@ -89,7 +87,7 @@ public interface WaypointAPI {
      * @param playerUuid The player's UUID
      * @return true if advanced successfully
      */
-    boolean nextWaypoint(@Nonnull UUID playerUuid);
+    boolean nextWaypoint(UUID playerUuid);
     
     /**
      * Marks a waypoint as completed.
@@ -97,7 +95,7 @@ public interface WaypointAPI {
      * @param playerUuid The player's UUID
      * @param waypointId The waypoint ID
      */
-    void completeWaypoint(@Nonnull UUID playerUuid, @Nonnull UUID waypointId);
+    void completeWaypoint(UUID playerUuid, UUID waypointId);
     
     /**
      * Checks if a waypoint is completed.
@@ -106,14 +104,14 @@ public interface WaypointAPI {
      * @param waypointId The waypoint ID
      * @return true if completed
      */
-    boolean isWaypointCompleted(@Nonnull UUID playerUuid, @Nonnull UUID waypointId);
+    boolean isWaypointCompleted(UUID playerUuid, UUID waypointId);
     
     /**
      * Clears all waypoints for a player.
      *
      * @param playerUuid The player's UUID
      */
-    void clearWaypoints(@Nonnull UUID playerUuid);
+    void clearWaypoints(UUID playerUuid);
     
     /**
      * Gets player waypoint data.
@@ -121,8 +119,8 @@ public interface WaypointAPI {
      * @param playerUuid The player's UUID
      * @return The player's waypoint data, or null if not found
      */
-    @Nullable
-    PlayerWaypointData getPlayerData(@Nonnull UUID playerUuid);
+
+    PlayerWaypointData getPlayerData(UUID playerUuid);
     
     /**
      * Toggles navigation for a player.
@@ -130,7 +128,7 @@ public interface WaypointAPI {
      * @param playerUuid The player's UUID
      * @param enabled Whether navigation should be enabled
      */
-    void setNavigationEnabled(@Nonnull UUID playerUuid, boolean enabled);
+    void setNavigationEnabled(UUID playerUuid, boolean enabled);
     
     /**
      * Toggles HUD display for a player.
@@ -138,7 +136,7 @@ public interface WaypointAPI {
      * @param playerUuid The player's UUID
      * @param enabled Whether HUD should be enabled
      */
-    void setHudEnabled(@Nonnull UUID playerUuid, boolean enabled);
+    void setHudEnabled(UUID playerUuid, boolean enabled);
     
     /**
      * Toggles world markers for a player.
@@ -146,5 +144,5 @@ public interface WaypointAPI {
      * @param playerUuid The player's UUID
      * @param enabled Whether world markers should be enabled
      */
-    void setWorldMarkersEnabled(@Nonnull UUID playerUuid, boolean enabled);
+    void setWorldMarkersEnabled(UUID playerUuid, boolean enabled);
 }

@@ -1,27 +1,23 @@
 package com.waypointnav.plugin.commands.subcommands;
 
-import com.hypixel.hytale.command.AbstractPlayerCommand;
-import com.hypixel.hytale.command.CommandContext;
-import com.hypixel.hytale.command.argument.OptionalArg;
-import com.hypixel.hytale.command.argument.RequiredArg;
-import com.hypixel.hytale.command.argument.type.ArgTypes;
-import com.hypixel.hytale.entity.Player;
-import com.hypixel.hytale.entity.PlayerRef;
-import com.hypixel.hytale.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
+import com.hypixel.hytale.server.core.command.system.CommandContext;
+import com.hypixel.hytale.server.core.command.system.argument.OptionalArg;
+import com.hypixel.hytale.server.core.command.system.argument.RequiredArg;
+import com.hypixel.hytale.server.core.command.system.argument.type.ArgTypes;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.math.Vec3d;
-import com.hypixel.hytale.message.Message;
-import com.hypixel.hytale.permission.GameMode;
-import com.hypixel.hytale.store.EntityStore;
-import com.hypixel.hytale.store.Ref;
-import com.hypixel.hytale.store.Store;
-import com.hypixel.hytale.world.World;
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.permission.GameMode;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MessageUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
 import com.waypointnav.plugin.waypoint.WaypointType;
-
-import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
@@ -41,15 +37,14 @@ public class AddCommand extends AbstractPlayerCommand {
     }
     
     @Override
-    protected void execute(@Nonnull CommandContext ctx,
-                         @Nonnull Store<EntityStore> store,
-                         @Nonnull Ref<EntityStore> ref,
-                         @Nonnull PlayerRef playerRef,
-                         @Nonnull World world) {
+    protected void execute(CommandContext ctx,
+                         Store<EntityStore> store,
+                         Ref<EntityStore> ref,
+                         PlayerRef playerRef,
+                         World world) {
         
         WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
-        Player player = store.getComponent(ref, Player.getComponentType());
-        UUID playerUuid = player.getUuid();
+        UUID playerUuid = playerRef.getUuid();
         
         String name = nameArg.get(ctx);
         Float radiusFloat = radiusArg.get(ctx);
@@ -57,19 +52,18 @@ public class AddCommand extends AbstractPlayerCommand {
             plugin.getConfigManager().getDouble("waypoint.defaultRadius", 5.0);
         
         if (radius <= 0) {
-            player.sendMessage(Message.raw(MessageUtils.error("Radius must be positive!")));
+            playerRef.sendMessage(Message.raw(MessageUtils.error("Radius must be positive!")));
             return;
         }
         
-        // Get player location
-        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
-        Vec3d position = transform.getPosition();
+        // Get player location from entity store
+        Vec3d position = store.getPosition(ref);
         
         // Check waypoint limit
         PlayerWaypointData playerData = plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
         int maxWaypoints = plugin.getConfigManager().getInt("waypoint.maxWaypoints", 50);
         if (playerData.getWaypoints().size() >= maxWaypoints) {
-            player.sendMessage(Message.raw(
+            playerRef.sendMessage(Message.raw(
                 MessageUtils.error("Maximum waypoint limit reached (" + maxWaypoints + ")!")
             ));
             return;
@@ -87,10 +81,10 @@ public class AddCommand extends AbstractPlayerCommand {
         plugin.getStorage().savePlayerDataAsync(playerData);
         
         // Confirm to player
-        player.sendMessage(Message.raw(MessageUtils.success("Added waypoint: " + name)));
-        player.sendMessage(Message.raw(MessageUtils.info(
+        playerRef.sendMessage(Message.raw(MessageUtils.success("Added waypoint: " + name)));
+        playerRef.sendMessage(Message.raw(MessageUtils.info(
             "Location: " + MessageUtils.formatCoordinates(position.getX(), position.getY(), position.getZ())
         )));
-        player.sendMessage(Message.raw(MessageUtils.info("Radius: " + radius + " blocks")));
+        playerRef.sendMessage(Message.raw(MessageUtils.info("Radius: " + radius + " blocks")));
     }
 }

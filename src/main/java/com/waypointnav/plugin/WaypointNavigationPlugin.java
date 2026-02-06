@@ -1,9 +1,11 @@
 package com.waypointnav.plugin;
 
-import com.hypixel.hytale.event.EventHandler;
-import com.hypixel.hytale.logging.HytaleLogger;
-import com.hypixel.hytale.plugin.JavaPlugin;
-import com.hypixel.hytale.plugin.JavaPluginInit;
+import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
+import com.hypixel.hytale.server.core.event.events.player.RemovePlayerFromWorldEvent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.waypointnav.plugin.api.WaypointAPI;
 import com.waypointnav.plugin.commands.WaypointCommand;
 import com.waypointnav.plugin.listeners.PlayerJoinListener;
@@ -19,8 +21,6 @@ import com.waypointnav.plugin.waypoint.Waypoint;
 import com.waypointnav.plugin.waypoint.WaypointManager;
 import com.waypointnav.plugin.waypoint.WaypointType;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +51,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
      *
      * @param init Plugin initialization data
      */
-    public WaypointNavigationPlugin(@Nonnull JavaPluginInit init) {
+    public WaypointNavigationPlugin(JavaPluginInit init) {
         super(init);
         instance = this;
     }
@@ -61,7 +61,6 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
      *
      * @return The plugin instance
      */
-    @Nonnull
     public static WaypointNavigationPlugin getInstance() {
         return instance;
     }
@@ -70,7 +69,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
      * Plugin setup method called during initialization.
      */
     @Override
-    public void setup() {
+    protected void setup() {
         LOGGER.atInfo().log("Initializing Waypoint Navigation Plugin...");
         
         // Initialize data folder
@@ -128,12 +127,26 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
     }
     
     /**
-     * Registers all event listeners.
+     * Registers all event listeners using the event registry.
      */
     private void registerListeners() {
         this.joinListener = new PlayerJoinListener(this);
         this.quitListener = new PlayerQuitListener(this);
         this.moveListener = new PlayerMoveListener(this);
+
+        this.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, event -> {
+            PlayerRef playerRef = event.getHolder().getComponent(PlayerRef.getComponentType());
+            if (playerRef != null) {
+                joinListener.onPlayerJoin(playerRef);
+            }
+        });
+
+        this.getEventRegistry().registerGlobal(RemovePlayerFromWorldEvent.class, event -> {
+            PlayerRef playerRef = event.getHolder().getComponent(PlayerRef.getComponentType());
+            if (playerRef != null) {
+                quitListener.onPlayerQuit(playerRef);
+            }
+        });
     }
     
     /**
@@ -154,39 +167,39 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
     }
     
     // Getters for managers
-    @Nonnull
+
     public WaypointManager getWaypointManager() { return waypointManager; }
     
-    @Nonnull
+
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
     
-    @Nonnull
+
     public WaypointStorage getStorage() { return storage; }
     
-    @Nonnull
+
     public ConfigManager getConfigManager() { return configManager; }
     
-    @Nonnull
+
     public HUDRenderer getHudRenderer() { return hudRenderer; }
     
-    @Nonnull
+
     public WorldRenderer getWorldRenderer() { return worldRenderer; }
     
     // API Implementation
     
     @Override
-    @Nonnull
-    public Waypoint createWaypoint(@Nonnull UUID playerUuid, @Nonnull String name,
-                                   double x, double y, double z, @Nonnull WaypointType type) {
+
+    public Waypoint createWaypoint(UUID playerUuid, String name,
+                                   double x, double y, double z, WaypointType type) {
         return createWaypoint(playerUuid, name, x, y, z, type, 
             configManager.getDouble("waypoint.defaultRadius", 5.0));
     }
     
     @Override
-    @Nonnull
-    public Waypoint createWaypoint(@Nonnull UUID playerUuid, @Nonnull String name,
+
+    public Waypoint createWaypoint(UUID playerUuid, String name,
                                    double x, double y, double z, 
-                                   @Nonnull WaypointType type, double radius) {
+                                   WaypointType type, double radius) {
         Waypoint waypoint = new Waypoint(name, x, y, z, type);
         waypoint.setCollectionRadius(radius);
         
@@ -197,7 +210,7 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
     }
     
     @Override
-    public boolean removeWaypoint(@Nonnull UUID playerUuid, @Nonnull UUID waypointId) {
+    public boolean removeWaypoint(UUID playerUuid, UUID waypointId) {
         PlayerWaypointData playerData = playerDataManager.getPlayerData(playerUuid);
         if (playerData == null) return false;
         
@@ -209,21 +222,21 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
     }
     
     @Override
-    @Nonnull
-    public List<Waypoint> getPlayerWaypoints(@Nonnull UUID playerUuid) {
+
+    public List<Waypoint> getPlayerWaypoints(UUID playerUuid) {
         PlayerWaypointData playerData = playerDataManager.getPlayerData(playerUuid);
         return playerData != null ? playerData.getWaypoints() : List.of();
     }
     
     @Override
-    @Nullable
-    public Waypoint getActiveWaypoint(@Nonnull UUID playerUuid) {
+
+    public Waypoint getActiveWaypoint(UUID playerUuid) {
         PlayerWaypointData playerData = playerDataManager.getPlayerData(playerUuid);
         return playerData != null ? playerData.getActiveWaypoint() : null;
     }
     
     @Override
-    public boolean setActiveWaypoint(@Nonnull UUID playerUuid, int index) {
+    public boolean setActiveWaypoint(UUID playerUuid, int index) {
         PlayerWaypointData playerData = playerDataManager.getPlayerData(playerUuid);
         if (playerData == null) return false;
         
@@ -235,13 +248,13 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
     }
     
     @Override
-    public boolean nextWaypoint(@Nonnull UUID playerUuid) {
+    public boolean nextWaypoint(UUID playerUuid) {
         PlayerWaypointData playerData = playerDataManager.getPlayerData(playerUuid);
         return playerData != null && playerData.nextWaypoint();
     }
     
     @Override
-    public void completeWaypoint(@Nonnull UUID playerUuid, @Nonnull UUID waypointId) {
+    public void completeWaypoint(UUID playerUuid, UUID waypointId) {
         PlayerWaypointData playerData = playerDataManager.getPlayerData(playerUuid);
         if (playerData != null) {
             playerData.completeWaypoint(waypointId);
@@ -249,13 +262,13 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
     }
     
     @Override
-    public boolean isWaypointCompleted(@Nonnull UUID playerUuid, @Nonnull UUID waypointId) {
+    public boolean isWaypointCompleted(UUID playerUuid, UUID waypointId) {
         PlayerWaypointData playerData = playerDataManager.getPlayerData(playerUuid);
         return playerData != null && playerData.isWaypointCompleted(waypointId);
     }
     
     @Override
-    public void clearWaypoints(@Nonnull UUID playerUuid) {
+    public void clearWaypoints(UUID playerUuid) {
         PlayerWaypointData playerData = playerDataManager.getPlayerData(playerUuid);
         if (playerData != null) {
             playerData.clearWaypoints();
@@ -263,25 +276,25 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
     }
     
     @Override
-    @Nullable
-    public PlayerWaypointData getPlayerData(@Nonnull UUID playerUuid) {
+
+    public PlayerWaypointData getPlayerData(UUID playerUuid) {
         return playerDataManager.getPlayerData(playerUuid);
     }
     
     @Override
-    public void setNavigationEnabled(@Nonnull UUID playerUuid, boolean enabled) {
+    public void setNavigationEnabled(UUID playerUuid, boolean enabled) {
         PlayerWaypointData playerData = playerDataManager.getOrCreatePlayerData(playerUuid);
         playerData.setNavigationEnabled(enabled);
     }
     
     @Override
-    public void setHudEnabled(@Nonnull UUID playerUuid, boolean enabled) {
+    public void setHudEnabled(UUID playerUuid, boolean enabled) {
         PlayerWaypointData playerData = playerDataManager.getOrCreatePlayerData(playerUuid);
         playerData.setHudEnabled(enabled);
     }
     
     @Override
-    public void setWorldMarkersEnabled(@Nonnull UUID playerUuid, boolean enabled) {
+    public void setWorldMarkersEnabled(UUID playerUuid, boolean enabled) {
         PlayerWaypointData playerData = playerDataManager.getOrCreatePlayerData(playerUuid);
         playerData.setWorldMarkersEnabled(enabled);
     }

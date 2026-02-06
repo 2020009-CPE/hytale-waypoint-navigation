@@ -1,7 +1,5 @@
 package com.waypointnav.plugin.player;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,8 +21,8 @@ public class PlayerDataManager {
      * @param playerUuid The player's UUID
      * @return The player's waypoint data
      */
-    @Nonnull
-    public PlayerWaypointData getOrCreatePlayerData(@Nonnull UUID playerUuid) {
+
+    public PlayerWaypointData getOrCreatePlayerData(UUID playerUuid) {
         return playerData.computeIfAbsent(playerUuid, PlayerWaypointData::new);
     }
     
@@ -34,8 +32,8 @@ public class PlayerDataManager {
      * @param playerUuid The player's UUID
      * @return The player's waypoint data, or null if not found
      */
-    @Nullable
-    public PlayerWaypointData getPlayerData(@Nonnull UUID playerUuid) {
+
+    public PlayerWaypointData getPlayerData(UUID playerUuid) {
         return playerData.get(playerUuid);
     }
     
@@ -45,7 +43,7 @@ public class PlayerDataManager {
      * @param playerUuid The player's UUID
      * @return true if data exists
      */
-    public boolean hasPlayerData(@Nonnull UUID playerUuid) {
+    public boolean hasPlayerData(UUID playerUuid) {
         return playerData.containsKey(playerUuid);
     }
     
@@ -55,8 +53,8 @@ public class PlayerDataManager {
      * @param playerUuid The player's UUID
      * @return The removed data, or null if none existed
      */
-    @Nullable
-    public PlayerWaypointData removePlayerData(@Nonnull UUID playerUuid) {
+
+    public PlayerWaypointData removePlayerData(UUID playerUuid) {
         return playerData.remove(playerUuid);
     }
     

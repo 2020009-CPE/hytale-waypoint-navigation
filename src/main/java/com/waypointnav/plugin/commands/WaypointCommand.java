@@ -1,6 +1,6 @@
 package com.waypointnav.plugin.commands;
 
-import com.hypixel.hytale.command.AbstractCommandCollection;
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
 import com.waypointnav.plugin.commands.subcommands.*;
 
 /**

@@ -3,9 +3,6 @@ package com.waypointnav.plugin.rendering;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MathUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
-
-import javax.annotation.Nonnull;
-
 /**
  * Handles rendering of HUD elements for waypoint navigation.
  * Displays direction arrows and distance information on the player's screen.
@@ -26,7 +23,7 @@ public class HUDRenderer {
      * @param playerYaw Player's current yaw (horizontal rotation)
      * @param playerPitch Player's current pitch (vertical rotation)
      */
-    public void render(@Nonnull PlayerWaypointData playerData, 
+    public void render(PlayerWaypointData playerData, 
                       double playerX, double playerY, double playerZ,
                       float playerYaw, float playerPitch) {
         
@@ -83,7 +80,7 @@ public class HUDRenderer {
      * @param distance Distance to waypoint
      * @param name Waypoint name
      */
-    private void renderDistanceText(double distance, @Nonnull String name) {
+    private void renderDistanceText(double distance, String name) {
         String distanceStr = MathUtils.formatDistance(distance);
         // Display waypoint name at top
         // Display formatted distance below name

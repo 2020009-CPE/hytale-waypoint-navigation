@@ -1,7 +1,5 @@
 package com.waypointnav.plugin.waypoint;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,7 +21,7 @@ public class WaypointManager {
      *
      * @param waypoint The waypoint to register
      */
-    public void registerWaypoint(@Nonnull Waypoint waypoint) {
+    public void registerWaypoint(Waypoint waypoint) {
         waypoints.put(waypoint.getId(), waypoint);
     }
     
@@ -33,7 +31,7 @@ public class WaypointManager {
      * @param waypointId The ID of the waypoint to unregister
      * @return true if the waypoint was removed, false otherwise
      */
-    public boolean unregisterWaypoint(@Nonnull UUID waypointId) {
+    public boolean unregisterWaypoint(UUID waypointId) {
         return waypoints.remove(waypointId) != null;
     }
     
@@ -43,8 +41,8 @@ public class WaypointManager {
      * @param id The waypoint ID
      * @return The waypoint, or null if not found
      */
-    @Nullable
-    public Waypoint getWaypoint(@Nonnull UUID id) {
+
+    public Waypoint getWaypoint(UUID id) {
         return waypoints.get(id);
     }
     
@@ -53,7 +51,7 @@ public class WaypointManager {
      *
      * @return An unmodifiable collection of all waypoints
      */
-    @Nonnull
+
     public Collection<Waypoint> getAllWaypoints() {
         return Collections.unmodifiableCollection(waypoints.values());
     }
@@ -69,9 +67,9 @@ public class WaypointManager {
      * @param type The waypoint type
      * @return The created waypoint
      */
-    @Nonnull
-    public Waypoint createWaypoint(@Nonnull UUID playerUuid, @Nonnull String name, 
-                                   double x, double y, double z, @Nonnull WaypointType type) {
+
+    public Waypoint createWaypoint(UUID playerUuid, String name, 
+                                   double x, double y, double z, WaypointType type) {
         Waypoint waypoint = new Waypoint(name, x, y, z, type);
         
         List<UUID> playerWaypointList = playerWaypoints.computeIfAbsent(
@@ -91,8 +89,8 @@ public class WaypointManager {
      * @param playerUuid The player's UUID
      * @return List of waypoint IDs for the player
      */
-    @Nonnull
-    public List<UUID> getPlayerWaypoints(@Nonnull UUID playerUuid) {
+
+    public List<UUID> getPlayerWaypoints(UUID playerUuid) {
         return playerWaypoints.getOrDefault(playerUuid.toString(), new ArrayList<>());
     }
     
@@ -101,7 +99,7 @@ public class WaypointManager {
      *
      * @param playerUuid The player's UUID
      */
-    public void clearPlayerWaypoints(@Nonnull UUID playerUuid) {
+    public void clearPlayerWaypoints(UUID playerUuid) {
         List<UUID> waypointIds = playerWaypoints.remove(playerUuid.toString());
         if (waypointIds != null) {
             waypointIds.forEach(waypoints::remove);
@@ -115,7 +113,7 @@ public class WaypointManager {
      * @param waypointId The waypoint ID to remove
      * @return true if removed successfully
      */
-    public boolean removePlayerWaypoint(@Nonnull UUID playerUuid, @Nonnull UUID waypointId) {
+    public boolean removePlayerWaypoint(UUID playerUuid, UUID waypointId) {
         List<UUID> waypointIds = playerWaypoints.get(playerUuid.toString());
         if (waypointIds != null && waypointIds.remove(waypointId)) {
             waypoints.remove(waypointId);
@@ -131,7 +129,7 @@ public class WaypointManager {
      *
      * @param playerUuid The player's UUID
      */
-    private void reorderPlayerWaypoints(@Nonnull UUID playerUuid) {
+    private void reorderPlayerWaypoints(UUID playerUuid) {
         List<UUID> waypointIds = playerWaypoints.get(playerUuid.toString());
         if (waypointIds != null) {
             for (int i = 0; i < waypointIds.size(); i++) {

@@ -3,7 +3,6 @@ package com.waypointnav.plugin.storage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import javax.annotation.Nonnull;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +17,7 @@ public class ConfigManager {
     private final Gson gson;
     private Map<String, Object> config;
     
-    public ConfigManager(@Nonnull Path dataFolder) {
+    public ConfigManager(Path dataFolder) {
         this.configPath = dataFolder.resolve("config.json");
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.config = new HashMap<>();
@@ -108,7 +107,7 @@ public class ConfigManager {
      * @return The configuration value
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(@Nonnull String path, T defaultValue) {
+    public <T> T get(String path, T defaultValue) {
         String[] parts = path.split("\\.");
         Object current = config;
         
@@ -137,7 +136,7 @@ public class ConfigManager {
      * @param value The value to set
      */
     @SuppressWarnings("unchecked")
-    public void set(@Nonnull String path, Object value) {
+    public void set(String path, Object value) {
         String[] parts = path.split("\\.");
         Map<String, Object> current = config;
         
@@ -163,7 +162,7 @@ public class ConfigManager {
      * @param defaultValue The default value
      * @return The boolean value
      */
-    public boolean getBoolean(@Nonnull String path, boolean defaultValue) {
+    public boolean getBoolean(String path, boolean defaultValue) {
         return get(path, defaultValue);
     }
     
@@ -174,7 +173,7 @@ public class ConfigManager {
      * @param defaultValue The default value
      * @return The integer value
      */
-    public int getInt(@Nonnull String path, int defaultValue) {
+    public int getInt(String path, int defaultValue) {
         Object value = get(path, defaultValue);
         if (value instanceof Number) {
             return ((Number) value).intValue();
@@ -189,7 +188,7 @@ public class ConfigManager {
      * @param defaultValue The default value
      * @return The double value
      */
-    public double getDouble(@Nonnull String path, double defaultValue) {
+    public double getDouble(String path, double defaultValue) {
         Object value = get(path, defaultValue);
         if (value instanceof Number) {
             return ((Number) value).doubleValue();
@@ -204,8 +203,8 @@ public class ConfigManager {
      * @param defaultValue The default value
      * @return The string value
      */
-    @Nonnull
-    public String getString(@Nonnull String path, @Nonnull String defaultValue) {
+
+    public String getString(String path, String defaultValue) {
         return get(path, defaultValue);
     }
 }

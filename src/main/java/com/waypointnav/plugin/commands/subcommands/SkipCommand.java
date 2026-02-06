@@ -1,21 +1,19 @@
 package com.waypointnav.plugin.commands.subcommands;
 
-import com.hypixel.hytale.command.AbstractPlayerCommand;
-import com.hypixel.hytale.command.CommandContext;
-import com.hypixel.hytale.entity.Player;
-import com.hypixel.hytale.entity.PlayerRef;
-import com.hypixel.hytale.message.Message;
-import com.hypixel.hytale.permission.GameMode;
-import com.hypixel.hytale.store.EntityStore;
-import com.hypixel.hytale.store.Ref;
-import com.hypixel.hytale.store.Store;
-import com.hypixel.hytale.world.World;
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
+import com.hypixel.hytale.server.core.command.system.CommandContext;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.permission.GameMode;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MessageUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
-
-import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
@@ -30,39 +28,38 @@ public class SkipCommand extends AbstractPlayerCommand {
     }
     
     @Override
-    protected void execute(@Nonnull CommandContext ctx,
-                         @Nonnull Store<EntityStore> store,
-                         @Nonnull Ref<EntityStore> ref,
-                         @Nonnull PlayerRef playerRef,
-                         @Nonnull World world) {
+    protected void execute(CommandContext ctx,
+                         Store<EntityStore> store,
+                         Ref<EntityStore> ref,
+                         PlayerRef playerRef,
+                         World world) {
         
         WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
-        Player player = store.getComponent(ref, Player.getComponentType());
-        UUID playerUuid = player.getUuid();
+        UUID playerUuid = playerRef.getUuid();
         
         PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
         
         if (playerData == null || playerData.getWaypoints().isEmpty()) {
-            player.sendMessage(Message.raw(MessageUtils.error("You have no waypoints!")));
+            playerRef.sendMessage(Message.raw(MessageUtils.error("You have no waypoints!")));
             return;
         }
         
         Waypoint current = playerData.getActiveWaypoint();
         if (current == null) {
-            player.sendMessage(Message.raw(MessageUtils.error("No active waypoint!")));
+            playerRef.sendMessage(Message.raw(MessageUtils.error("No active waypoint!")));
             return;
         }
         
         String currentName = current.getName();
         
         if (playerData.skipCurrentWaypoint()) {
-            player.sendMessage(Message.raw(MessageUtils.success("Skipped waypoint: " + currentName)));
+            playerRef.sendMessage(Message.raw(MessageUtils.success("Skipped waypoint: " + currentName)));
             
             Waypoint next = playerData.getActiveWaypoint();
             if (next != null) {
-                player.sendMessage(Message.raw(MessageUtils.info("Next waypoint: " + next.getName())));
+                playerRef.sendMessage(Message.raw(MessageUtils.info("Next waypoint: " + next.getName())));
             } else {
-                player.sendMessage(Message.raw(MessageUtils.success("All waypoints completed!")));
+                playerRef.sendMessage(Message.raw(MessageUtils.success("All waypoints completed!")));
             }
             
             // Save
@@ -70,8 +67,8 @@ public class SkipCommand extends AbstractPlayerCommand {
         } else {
             // Already at last waypoint
             playerData.completeWaypoint(current.getId());
-            player.sendMessage(Message.raw(MessageUtils.success("Skipped last waypoint: " + currentName)));
-            player.sendMessage(Message.raw(MessageUtils.success("All waypoints completed!")));
+            playerRef.sendMessage(Message.raw(MessageUtils.success("Skipped last waypoint: " + currentName)));
+            playerRef.sendMessage(Message.raw(MessageUtils.success("All waypoints completed!")));
             
             plugin.getStorage().savePlayerDataAsync(playerData);
         }

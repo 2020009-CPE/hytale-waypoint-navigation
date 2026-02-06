@@ -1,7 +1,7 @@
 plugins {
     id("java-library")
+    id("hytale-mod") version "0.+"
     id("com.gradleup.shadow") version "9.3.1"
-    id("run-hytale")
 }
 
 group = project.property("maven_group") as String
@@ -9,27 +9,22 @@ version = project.property("version") as String
 
 repositories {
     mavenCentral()
-    maven("https://repo.hypixel.net/repository/Hytale/")
+    maven("https://maven.hytale-mods.dev/releases") {
+        name = "HytaleModdingReleases"
+    }
 }
 
 dependencies {
-    // Hytale API - Using local stub classes bundled in the JAR until official API is released.
-    // The stub classes are located in src/main/java/com/hypixel/hytale/ and are included
-    // in the shadow JAR so the plugin can load without the official Hytale API.
-    // When the official Hytale API is available, remove the stubs, uncomment the dependency
-    // below, and re-add the exclude("com/hypixel/**") to the shadowJar task:
-    // compileOnly("com.hypixel.hytale:hytale-api:+")
-    
-    // JSON processing
+    // JSON processing (shaded into the JAR)
     implementation("com.google.code.gson:gson:2.10.1")
-    
-    // Annotations (JSR-305 for @Nonnull, @Nullable, etc.)
-    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+
+    // Annotations
+    compileOnly("org.jetbrains:annotations:26.0.2-1")
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(project.property("java_version") as String))
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -37,26 +32,24 @@ tasks {
     shadowJar {
         archiveClassifier.set("")
         archiveBaseName.set("WaypointNavigation")
-        
-        // Include Hytale API stubs in the JAR so the plugin can load without
-        // the official Hytale API on the server's classpath.
-        // When the official Hytale API is available, remove the stubs,
-        // uncomment the compileOnly dependency above, and re-add:
-        //   exclude("com/hypixel/**")
-        
+
         // Relocate dependencies to avoid conflicts
         relocate("com.google.gson", "com.waypointnav.libs.gson")
     }
-    
+
     build {
         dependsOn(shadowJar)
     }
-    
+
     processResources {
-        inputs.property("version", project.version)
-        
+        val replaceProperties = mapOf(
+            "version" to project.version
+        )
+
         filesMatching("manifest.json") {
-            expand("version" to project.version)
+            expand(replaceProperties)
         }
+
+        inputs.properties(replaceProperties)
     }
 }

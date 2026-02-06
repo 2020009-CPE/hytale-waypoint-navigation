@@ -47,6 +47,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     public static final String LAYOUT = "WaypointNavigation/WaypointPanel.ui";
     public static final String LIST_ITEM = "WaypointNavigation/WaypointListItem.ui";
+    private static final String REMOVE_ACTION_PREFIX = "removeWaypoint:";
 
     private final PlayerRef playerRef;
     private String inputWpName = "";
@@ -124,7 +125,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
             evt.addEventBinding(
                 CustomUIEventBindingType.Activating,
                 selector,
-                EventData.of("Action", "removeWaypoint:" + i),
+                EventData.of("Action", REMOVE_ACTION_PREFIX + i),
                 false
             );
         }
@@ -186,8 +187,13 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
         LOGGER.atInfo().log("Waypoint UI event: action=%s, name=%s",
             data.action, data.wpName);
 
-        if (action.startsWith("removeWaypoint:")) {
-            int index = parseIntSafe(action.substring("removeWaypoint:".length()), -1);
+        if (action.startsWith(REMOVE_ACTION_PREFIX)) {
+            int index = parseIntSafe(action.substring(REMOVE_ACTION_PREFIX.length()), -1);
+            if (index < 0) {
+                LOGGER.atInfo().log("Invalid remove waypoint index in action: %s", action);
+                sendUpdate();
+                return;
+            }
             handleRemoveWaypoint(plugin, playerData, index);
         } else switch (action) {
             case "addHere":
@@ -395,7 +401,7 @@ public class WaypointPage extends InteractiveCustomUIPage<WaypointPage.WaypointE
             evt.addEventBinding(
                 CustomUIEventBindingType.Activating,
                 selector,
-                EventData.of("Action", "removeWaypoint:" + i),
+                EventData.of("Action", REMOVE_ACTION_PREFIX + i),
                 false
             );
         }

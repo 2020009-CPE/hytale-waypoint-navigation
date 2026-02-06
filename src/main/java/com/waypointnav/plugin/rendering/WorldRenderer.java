@@ -1,19 +1,30 @@
 package com.waypointnav.plugin.rendering;
 
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MathUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
 /**
  * Handles rendering of world-space markers for waypoints.
  * Creates 3D particle effects and visual indicators in the game world.
- * 
- * Note: Specific Hytale particle APIs are not yet documented.
- * This class provides the logic framework ready for integration with Hytale's
- * particle system when available.
+ *
+ * Particles are rendered frequently and in high counts to ensure they are
+ * clearly visible. A tall vertical beacon column marks the waypoint location,
+ * and a dense particle trail guides players from their position toward it.
  */
 public class WorldRenderer {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     private int tickCounter = 0;
-    
+
+    // Rendering constants — tuned for maximum visibility
+    private static final int BEACON_HEIGHT = 20;        // Tall vertical column (blocks)
+    private static final int BEACON_RING_POINTS = 16;   // Points per ring for circular base
+    private static final double BEACON_RADIUS = 1.5;    // Ring radius at base
+    private static final int TRAIL_MAX_PARTICLES = 20;  // Max particles in direction trail
+    private static final double TRAIL_SPACING = 1.5;    // Blocks between trail particles
+    private static final int RENDER_INTERVAL = 2;       // Ticks between updates (10 times/sec)
+    private static final double MAX_RENDER_DISTANCE = 500; // Max render distance in blocks
+
     /**
      * Updates world markers for a player. Should be called every tick.
      *
@@ -24,27 +35,28 @@ public class WorldRenderer {
      */
     public void update(PlayerWaypointData playerData,
                       double playerX, double playerY, double playerZ) {
-        
+
         tickCounter++;
-        
+
         if (!playerData.isWorldMarkersEnabled()) {
+            LOGGER.atFine().log("[DEBUG] World markers disabled for player, skipping render.");
             return;
         }
-        
+
         Waypoint active = playerData.getActiveWaypoint();
         if (active == null) {
+            LOGGER.atFine().log("[DEBUG] No active waypoint for player, skipping world marker render.");
             return;
         }
-        
-        // Update every 5 ticks (4 times per second) to reduce particle spam
-        if (tickCounter % 5 == 0) {
+
+        // Render every RENDER_INTERVAL ticks (10 times/second for high visibility)
+        if (tickCounter % RENDER_INTERVAL == 0) {
             renderWaypointMarker(active, playerX, playerY, playerZ);
         }
     }
-    
+
     /**
      * Renders a marker for a waypoint in the world.
-     * Placeholder for Hytale particle API integration.
      *
      * @param waypoint The waypoint to mark
      * @param playerX Player's X position
@@ -54,97 +66,96 @@ public class WorldRenderer {
     private void renderWaypointMarker(Waypoint waypoint,
                                       double playerX, double playerY, double playerZ) {
         double distance = waypoint.distanceFrom(playerX, playerY, playerZ);
-        
+
         // Don't render if too far away (performance optimization)
-        if (distance > 500) {
+        if (distance > MAX_RENDER_DISTANCE) {
+            LOGGER.atFine().log("[DEBUG] Waypoint '%s' is %.1f blocks away (>%.0f), skipping world marker.",
+                waypoint.getName(), distance, MAX_RENDER_DISTANCE);
             return;
         }
-        
-        // Calculate direction vector
+
+        LOGGER.atFine().log("[DEBUG] Rendering world marker for waypoint '%s' at (%.1f, %.1f, %.1f), distance: %.1f",
+            waypoint.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ(), distance);
+
+        // Calculate direction vector from player eye level to waypoint
         double[] direction = MathUtils.directionVector(
-            playerX, playerY + 1.6, playerZ, // Player eye level
+            playerX, playerY + 1.6, playerZ,
             waypoint.getX(), waypoint.getY(), waypoint.getZ()
         );
-        
-        // Render particles in a line toward the waypoint
-        renderParticleLine(
+
+        // 1) Dense particle trail from player toward waypoint
+        renderParticleTrail(
             playerX, playerY + 1.6, playerZ,
             direction[0], direction[1], direction[2],
             distance
         );
-        
-        // Render marker at waypoint location
-        renderWaypointBeacon(waypoint.getX(), waypoint.getY(), waypoint.getZ());
+
+        // 2) Tall beacon column at the waypoint location
+        renderBeaconColumn(waypoint.getX(), waypoint.getY(), waypoint.getZ(), distance);
+
+        // 3) Rotating ring at the base of the beacon
+        renderBeaconRing(waypoint.getX(), waypoint.getY(), waypoint.getZ());
     }
-    
+
     /**
-     * Renders a line of particles pointing toward the waypoint.
-     * Placeholder for Hytale particle API integration.
-     *
-     * @param startX Start X position
-     * @param startY Start Y position
-     * @param startZ Start Z position
-     * @param dirX Direction X component (normalized)
-     * @param dirY Direction Y component (normalized)
-     * @param dirZ Direction Z component (normalized)
-     * @param distance Distance to waypoint
+     * Renders a dense line of particles from the player toward the waypoint.
+     * Uses close spacing (1.5 blocks) and up to 20 particles for clear directionality.
      */
-    private void renderParticleLine(double startX, double startY, double startZ,
-                                   double dirX, double dirY, double dirZ,
-                                   double distance) {
-        // Spawn particles in a line from player toward waypoint
-        // Particle spacing should be about 2 blocks
-        // Limit to first 20 blocks to avoid clutter
-        
-        int particleCount = Math.min(10, (int)(distance / 2));
-        
+    private void renderParticleTrail(double startX, double startY, double startZ,
+                                     double dirX, double dirY, double dirZ,
+                                     double distance) {
+        int particleCount = Math.min(TRAIL_MAX_PARTICLES, (int)(distance / TRAIL_SPACING));
+
+        String particleType = getDistanceParticleType(distance);
+
         for (int i = 1; i <= particleCount; i++) {
-            double step = i * 2.0; // 2 blocks apart
+            double step = i * TRAIL_SPACING;
             double x = startX + dirX * step;
             double y = startY + dirY * step;
             double z = startZ + dirZ * step;
-            
-            // Use Hytale's particle system to spawn particle at (x, y, z)
-            // Use different particle types based on distance:
-            // - Close: Green particles
-            // - Medium: Yellow particles
-            // - Far: Red particles
-            spawnParticle(x, y, z, getParticleType(distance));
+
+            spawnParticle(x, y, z, particleType);
+            // Spawn a second offset particle for extra density
+            spawnParticle(x, y + 0.3, z, particleType);
         }
     }
-    
+
     /**
-     * Renders a beacon effect at the waypoint location.
-     * Placeholder for Hytale particle API integration.
-     *
-     * @param x Waypoint X position
-     * @param y Waypoint Y position
-     * @param z Waypoint Z position
+     * Renders a tall vertical beacon column at the waypoint.
+     * The column is BEACON_HEIGHT blocks tall, using bright particles every 0.5 blocks
+     * so it is visible from far away.
      */
-    private void renderWaypointBeacon(double x, double y, double z) {
-        // Create a vertical beam of particles at waypoint location
-        // Spiral or circular pattern works well
-        
-        double angle = (tickCounter * 10) % 360;
-        double radians = Math.toRadians(angle);
-        double radius = 1.0;
-        
-        // Create circular particle effect
-        for (int i = 0; i < 8; i++) {
-            double offsetAngle = radians + (i * Math.PI / 4);
-            double offsetX = Math.cos(offsetAngle) * radius;
-            double offsetZ = Math.sin(offsetAngle) * radius;
-            
-            spawnParticle(x + offsetX, y, z + offsetZ, "FLAME");
+    private void renderBeaconColumn(double x, double y, double z, double distance) {
+        String columnType = getDistanceParticleType(distance);
+
+        for (int i = 0; i < BEACON_HEIGHT * 2; i++) {
+            double offsetY = i * 0.5;
+            spawnParticle(x, y + offsetY, z, columnType);
         }
-        
-        // Vertical beam
-        for (int i = 0; i < 5; i++) {
-            double offsetY = y + (i * 0.5);
-            spawnParticle(x, offsetY, z, "END_ROD");
+
+        // Additional bright "END_ROD" particles along the column for glow effect
+        for (int i = 0; i < BEACON_HEIGHT; i++) {
+            spawnParticle(x, y + i, z, "END_ROD");
         }
     }
-    
+
+    /**
+     * Renders a rotating ring of particles at the waypoint base for visibility.
+     */
+    private void renderBeaconRing(double x, double y, double z) {
+        double angle = (tickCounter * 15) % 360;
+        double radians = Math.toRadians(angle);
+
+        for (int i = 0; i < BEACON_RING_POINTS; i++) {
+            double offsetAngle = radians + (i * 2 * Math.PI / BEACON_RING_POINTS);
+            double offsetX = Math.cos(offsetAngle) * BEACON_RADIUS;
+            double offsetZ = Math.sin(offsetAngle) * BEACON_RADIUS;
+
+            spawnParticle(x + offsetX, y, z + offsetZ, "FLAME");
+            spawnParticle(x + offsetX, y + 0.5, z + offsetZ, "FLAME");
+        }
+    }
+
     /**
      * Spawns a particle at the specified location.
      * Placeholder for Hytale particle API integration.
@@ -155,32 +166,33 @@ public class WorldRenderer {
      * @param particleType Type of particle to spawn
      */
     private void spawnParticle(double x, double y, double z, String particleType) {
-        // Use Hytale's particle system:
+        // TODO: Use Hytale's particle system when API is available:
         // world.spawnParticle(particleType, x, y, z, count, offsetX, offsetY, offsetZ, speed);
+        LOGGER.atFine().log("[DEBUG] Particle spawn requested: type=%s at (%.2f, %.2f, %.2f) - awaiting Hytale particle API",
+            particleType, x, y, z);
     }
-    
+
     /**
-     * Gets the particle type based on distance.
+     * Gets the particle type based on distance — distance-based color coding.
      *
      * @param distance Distance in blocks
      * @return Particle type name
      */
-
-    private String getParticleType(double distance) {
+    private String getDistanceParticleType(double distance) {
         if (distance < 50) {
-            return "HAPPY_VILLAGER"; // Green
+            return "HAPPY_VILLAGER"; // Green — very close
         } else if (distance < 200) {
-            return "FLAME"; // Orange/Yellow
+            return "FLAME"; // Orange/Yellow — medium
         } else {
-            return "LAVA"; // Red
+            return "LAVA"; // Red — far
         }
     }
-    
+
     /**
      * Clears all world markers.
      */
     public void clear() {
-        // Particles naturally despawn, so nothing to clear
+        LOGGER.atFine().log("[DEBUG] Clearing all world markers, resetting tick counter.");
         tickCounter = 0;
     }
 }

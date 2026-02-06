@@ -187,6 +187,7 @@ public class WaypointStorage {
             String typeStr = (String) map.get("type");
             int order = ((Number) map.get("order")).intValue();
             boolean completed = (Boolean) map.getOrDefault("completed", false);
+            int priority = map.containsKey("priority") ? ((Number) map.get("priority")).intValue() : 0;
             
             Waypoint waypoint = new Waypoint(
                 id, name, x, y, z, radius,
@@ -194,6 +195,7 @@ public class WaypointStorage {
                 order
             );
             waypoint.setCompleted(completed);
+            waypoint.setPriority(priority);
             
             Object worldObj = map.get("world");
             if (worldObj instanceof String) {

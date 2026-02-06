@@ -1,5 +1,6 @@
 package com.waypointnav.plugin.listeners;
 
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
@@ -10,6 +11,7 @@ import java.util.UUID;
  * Handles player join events to load waypoint data.
  */
 public class PlayerJoinListener {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     private final WaypointNavigationPlugin plugin;
     
     public PlayerJoinListener(WaypointNavigationPlugin plugin) {
@@ -23,10 +25,15 @@ public class PlayerJoinListener {
      */
     public void onPlayerJoin(PlayerRef playerRef) {
         UUID playerUuid = playerRef.getUuid();
+        LOGGER.atInfo().log("Player %s joined. Loading waypoint data...", playerUuid);
+        
+        boolean alwaysEnabled = plugin.getConfigManager().getBoolean("navigation.alwaysEnabled", true);
         
         // Load player data asynchronously
         plugin.getStorage().loadPlayerDataAsync(playerUuid).thenAccept(data -> {
             if (data != null) {
+                LOGGER.atInfo().log("Loaded %d waypoint(s) for player %s.",
+                    data.getWaypoints().size(), playerUuid);
                 plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
                 // Copy loaded data into player data manager
                 PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
@@ -34,12 +41,22 @@ public class PlayerJoinListener {
                     // Merge loaded waypoints
                     data.getWaypoints().forEach(playerData::addWaypoint);
                     playerData.setActiveWaypointIndex(data.getActiveWaypointIndex());
-                    playerData.setNavigationEnabled(data.isNavigationEnabled());
                     playerData.setHudEnabled(data.isHudEnabled());
                     playerData.setWorldMarkersEnabled(data.isWorldMarkersEnabled());
+                    
+                    // Force navigation enabled if config says always-on
+                    if (alwaysEnabled) {
+                        playerData.setNavigationEnabled(true);
+                    } else {
+                        playerData.setNavigationEnabled(data.isNavigationEnabled());
+                    }
+                    
+                    // Recalculate active waypoint based on priority
+                    playerData.recalculateActiveWaypoint();
                 }
             } else {
-                // Create new player data
+                LOGGER.atInfo().log("No saved data found for player %s. Creating new profile.", playerUuid);
+                // Create new player data (navigation is enabled by default)
                 plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);
             }
         });

@@ -74,31 +74,39 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         
         // Initialize data folder
         Path dataFolder = getDataDirectory();
+        LOGGER.atInfo().log("Data directory: %s", dataFolder);
         
         // Initialize managers
         this.waypointManager = new WaypointManager();
         this.playerDataManager = new PlayerDataManager();
         this.storage = new WaypointStorage(dataFolder);
         this.configManager = new ConfigManager(dataFolder);
+        LOGGER.atInfo().log("Managers initialized.");
         
         // Initialize renderers
         this.hudRenderer = new HUDRenderer();
         this.worldRenderer = new WorldRenderer();
+        LOGGER.atInfo().log("Renderers initialized (HUD + World markers).");
         
         // Load configuration
         configManager.load();
+        LOGGER.atInfo().log("Configuration loaded.");
         
         // Initialize storage
         storage.initialize();
+        LOGGER.atInfo().log("Storage system initialized.");
         
         // Register commands
         registerCommands();
+        LOGGER.atInfo().log("Commands registered (including /waypoint help).");
         
         // Register event listeners
         registerListeners();
+        LOGGER.atInfo().log("Event listeners registered.");
         
         // Start update tasks
         startUpdateTasks();
+        LOGGER.atInfo().log("Update tasks started.");
         
         LOGGER.atInfo().log("Waypoint Navigation Plugin enabled!");
     }
@@ -156,12 +164,14 @@ public class WaypointNavigationPlugin extends JavaPlugin implements WaypointAPI 
         // Note: Specific scheduler API not yet documented
         // This would use Hytale's World.execute() or scheduler system for periodic tasks
         // to update HUD rendering, world markers, and perform auto-saves
+        LOGGER.atInfo().log("Periodic update tasks not yet started - awaiting Hytale scheduler API.");
     }
     
     /**
      * Saves all player data asynchronously.
      */
     private void saveAllPlayerData() {
+        LOGGER.atInfo().log("Saving all player data on shutdown...");
         // Note: Would iterate through online players using Hytale's player manager
         // and save their waypoint data
     }

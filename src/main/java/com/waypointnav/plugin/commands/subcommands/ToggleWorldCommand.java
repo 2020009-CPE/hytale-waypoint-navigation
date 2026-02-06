@@ -31,6 +31,12 @@ public class ToggleWorldCommand extends AbstractPlayerCommand {
                          PlayerRef playerRef,
                          World world) {
         
+        // Permission check
+        if (!playerRef.hasPermission("waypoint.admin")) {
+            playerRef.sendMessage(Message.raw(MessageUtils.error("You need the 'waypoint.admin' permission!")));
+            return;
+        }
+        
         WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
         UUID playerUuid = playerRef.getUuid();
         
@@ -42,7 +48,7 @@ public class ToggleWorldCommand extends AbstractPlayerCommand {
         // Save
         plugin.getStorage().savePlayerDataAsync(playerData);
         
-        String status = newState ? "§aenabled" : "§cdisabled";
+        String status = newState ? "enabled" : "disabled";
         playerRef.sendMessage(Message.raw(MessageUtils.success("World markers " + status + "!")));
     }
 }

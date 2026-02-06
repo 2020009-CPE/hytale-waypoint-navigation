@@ -1,0 +1,16 @@
+// Waypoint Navigation - Single waypoint list item template
+// Appended dynamically into #WaypointList container
+
+$C = "../Common.ui";
+
+@ItemBtn = TextButtonStyle(
+  Default: (Background: #1a2332, LabelStyle: (FontSize: 12, TextColor: #96a9be, HorizontalAlignment: Start, VerticalAlignment: Center)),
+  Hovered: (Background: #243346, LabelStyle: (FontSize: 12, TextColor: #ffffff, HorizontalAlignment: Start, VerticalAlignment: Center)),
+  Pressed: (Background: #0d1218, LabelStyle: (FontSize: 12, TextColor: #96a9be, HorizontalAlignment: Start, VerticalAlignment: Center))
+);
+
+TextButton {
+  Text: "  -  Loading...";
+  Anchor: (Height: 32);
+  Style: @ItemBtn;
+}

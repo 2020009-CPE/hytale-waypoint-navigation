@@ -33,6 +33,12 @@ public class ListCommand extends AbstractPlayerCommand {
                          PlayerRef playerRef,
                          World world) {
         
+        // Permission check
+        if (!playerRef.hasPermission("waypoint.admin")) {
+            playerRef.sendMessage(Message.raw(MessageUtils.error("You need the 'waypoint.admin' permission!")));
+            return;
+        }
+        
         WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
         UUID playerUuid = playerRef.getUuid();
         
@@ -55,14 +61,15 @@ public class ListCommand extends AbstractPlayerCommand {
             Waypoint wp = waypoints.get(i);
             double distance = wp.distanceFrom(position.getX(), position.getY(), position.getZ());
             
-            String marker = (i == activeIndex) ? "§a→ " : "  ";
+            String marker = (i == activeIndex) ? "> " : "  ";
             String message = MessageUtils.formatWaypointList(
                 i, wp.getName(), 
                 wp.getX(), wp.getY(), wp.getZ(),
                 distance, wp.isCompleted()
             );
+            String priorityStr = " (P:" + wp.getPriority() + ")";
             
-            playerRef.sendMessage(Message.raw(marker + message));
+            playerRef.sendMessage(Message.raw(marker + message + priorityStr));
         }
         
         int completed = (int) waypoints.stream().filter(Waypoint::isCompleted).count();

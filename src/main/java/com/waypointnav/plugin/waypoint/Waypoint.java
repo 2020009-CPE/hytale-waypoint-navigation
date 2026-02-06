@@ -15,6 +15,7 @@ public class Waypoint {
     private double collectionRadius;
     private WaypointType type;
     private int order;
+    private int priority; // Lower number = higher priority (default 0)
     private boolean completed;
     private String world;
     
@@ -40,6 +41,7 @@ public class Waypoint {
         this.collectionRadius = collectionRadius;
         this.type = type;
         this.order = order;
+        this.priority = 0;
         this.completed = false;
         this.world = "world"; // Default world
     }
@@ -66,6 +68,7 @@ public class Waypoint {
     public double getCollectionRadius() { return collectionRadius; }
     public WaypointType getType() { return type; }
     public int getOrder() { return order; }
+    public int getPriority() { return priority; }
     public boolean isCompleted() { return completed; }
     public String getWorld() { return world; }
     
@@ -77,6 +80,7 @@ public class Waypoint {
     public void setCollectionRadius(double radius) { this.collectionRadius = radius; }
     public void setType(WaypointType type) { this.type = type; }
     public void setOrder(int order) { this.order = order; }
+    public void setPriority(int priority) { this.priority = priority; }
     public void setCompleted(boolean completed) { this.completed = completed; }
     public void setWorld(String world) { this.world = world; }
     

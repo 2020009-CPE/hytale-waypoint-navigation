@@ -1,5 +1,6 @@
 package com.waypointnav.plugin.listeners;
 
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.waypoint.Waypoint;
@@ -12,6 +13,7 @@ import com.waypointnav.plugin.waypoint.Waypoint;
  * check player positions against active waypoints.
  */
 public class PlayerMoveListener {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     private final WaypointNavigationPlugin plugin;
     
     public PlayerMoveListener(WaypointNavigationPlugin plugin) {
@@ -43,6 +45,8 @@ public class PlayerMoveListener {
         
         // Check if player is within collection radius
         if (activeWaypoint.isWithinRadius(x, y, z)) {
+            LOGGER.atInfo().log("Player %s reached waypoint '%s' (within radius %.1f).",
+                playerUuid, activeWaypoint.getName(), activeWaypoint.getCollectionRadius());
             handleWaypointReached(playerData, activeWaypoint);
         }
     }
@@ -58,10 +62,12 @@ public class PlayerMoveListener {
         // Mark as completed
         playerData.completeWaypoint(waypoint.getId());
         waypoint.setCompleted(true);
+        LOGGER.atInfo().log("Waypoint '%s' (id=%s) marked as completed.", waypoint.getName(), waypoint.getId());
         
         // Auto-progress to next waypoint if enabled
         if (plugin.getConfigManager().getBoolean("waypoint.autoProgress", true)) {
-            playerData.nextWaypoint();
+            boolean advanced = playerData.nextWaypoint();
+            LOGGER.atInfo().log("Auto-progress enabled. Advanced to next waypoint: %s", advanced);
         }
         
         // Save player data

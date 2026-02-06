@@ -3,9 +3,8 @@ package com.waypointnav.plugin.commands.subcommands;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.math.Vec3d;
+import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.permission.GameMode;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -25,7 +24,6 @@ public class NextCommand extends AbstractPlayerCommand {
     
     public NextCommand() {
         super("next", "Switch to the next waypoint");
-        this.setPermissionGroup(GameMode.Adventure);
     }
     
     @Override
@@ -52,7 +50,7 @@ public class NextCommand extends AbstractPlayerCommand {
                     MessageUtils.success("Switched to next waypoint: " + nextWaypoint.getName())
                 ));
                 
-                Vec3d position = store.getPosition(ref);
+                Vector3d position = new Vector3d(playerRef.getTransform().getPosition());
                 double distance = nextWaypoint.distanceFrom(position.getX(), position.getY(), position.getZ());
                 
                 playerRef.sendMessage(Message.raw(MessageUtils.info(

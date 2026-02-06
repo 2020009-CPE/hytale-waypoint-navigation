@@ -2,13 +2,12 @@ package com.waypointnav.plugin.commands.subcommands;
 
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.argument.OptionalArg;
-import com.hypixel.hytale.server.core.command.system.argument.RequiredArg;
-import com.hypixel.hytale.server.core.command.system.argument.type.ArgTypes;
+import com.hypixel.hytale.server.core.command.system.arguments.system.OptionalArg;
+import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
+import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.math.Vec3d;
+import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.permission.GameMode;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -30,7 +29,6 @@ public class AddCommand extends AbstractPlayerCommand {
     
     public AddCommand() {
         super("add", "Add a waypoint at your current location");
-        this.setPermissionGroup(GameMode.Adventure);
         
         this.nameArg = withRequiredArg("name", "Name of the waypoint", ArgTypes.STRING);
         this.radiusArg = withOptionalArg("radius", "Collection radius in blocks", ArgTypes.FLOAT);
@@ -56,8 +54,8 @@ public class AddCommand extends AbstractPlayerCommand {
             return;
         }
         
-        // Get player location from store
-        Vec3d position = store.getPosition(ref);
+        // Get player position from the player's transform
+        Vector3d position = new Vector3d(playerRef.getTransform().getPosition());
         
         // Check waypoint limit
         PlayerWaypointData playerData = plugin.getPlayerDataManager().getOrCreatePlayerData(playerUuid);

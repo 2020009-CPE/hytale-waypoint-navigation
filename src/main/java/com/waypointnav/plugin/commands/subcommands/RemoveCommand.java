@@ -2,12 +2,11 @@ package com.waypointnav.plugin.commands.subcommands;
 
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.argument.RequiredArg;
-import com.hypixel.hytale.server.core.command.system.argument.type.ArgTypes;
+import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
+import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.permission.GameMode;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -28,7 +27,6 @@ public class RemoveCommand extends AbstractPlayerCommand {
     
     public RemoveCommand() {
         super("remove", "Remove a waypoint by index");
-        this.setPermissionGroup(GameMode.Adventure);
         
         this.indexArg = withRequiredArg("index", "Index of the waypoint to remove", ArgTypes.INTEGER);
     }

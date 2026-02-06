@@ -40,12 +40,6 @@ public class UICommand extends AbstractPlayerCommand {
             @Nonnull PlayerRef playerRef,
             @Nonnull World world
     ) {
-        // Permission check
-        if (!playerRef.hasPermission("waypoint.admin")) {
-            playerRef.sendMessage(Message.raw(MessageUtils.error("You need the 'waypoint.admin' permission!")));
-            return;
-        }
-
         Player player = store.getComponent(ref, Player.getComponentType());
         if (player == null) {
             playerRef.sendMessage(Message.raw(MessageUtils.error("Could not access player entity.")));

@@ -40,12 +40,12 @@ public class AddCommand extends AbstractPlayerCommand {
     public AddCommand() {
         super("add", "Add a waypoint (use 'here' for current position or specify x y z)");
         
-        this.nameArg = withRequiredArg("name_or_here", "Waypoint name or 'here'", ArgTypes.STRING);
-        this.extraArg1 = withOptionalArg("arg1", "Name (if 'here') or X coordinate", ArgTypes.STRING);
-        this.extraArg2 = withOptionalArg("arg2", "Priority/radius (if 'here') or Y coordinate", ArgTypes.STRING);
-        this.extraArg3 = withOptionalArg("arg3", "Radius (if 'here') or Z coordinate", ArgTypes.STRING);
-        this.extraArg4 = withOptionalArg("arg4", "Priority (if coords)", ArgTypes.STRING);
-        this.extraArg5 = withOptionalArg("arg5", "Radius (if coords)", ArgTypes.STRING);
+        this.nameArg = withRequiredArg("name_or_here", "Waypoint name or 'here'", ArgTypes.string());
+        this.extraArg1 = withOptionalArg("arg1", "Name (if 'here') or X coordinate", ArgTypes.string());
+        this.extraArg2 = withOptionalArg("arg2", "Priority/radius (if 'here') or Y coordinate", ArgTypes.string());
+        this.extraArg3 = withOptionalArg("arg3", "Radius (if 'here') or Z coordinate", ArgTypes.string());
+        this.extraArg4 = withOptionalArg("arg4", "Priority (if coords)", ArgTypes.string());
+        this.extraArg5 = withOptionalArg("arg5", "Radius (if coords)", ArgTypes.string());
     }
     
     @Override

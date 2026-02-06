@@ -28,7 +28,7 @@ public class RemoveCommand extends AbstractPlayerCommand {
     public RemoveCommand() {
         super("remove", "Remove a waypoint by index");
         
-        this.indexArg = withRequiredArg("index", "Index of the waypoint to remove", ArgTypes.INTEGER);
+        this.indexArg = withRequiredArg("index", "Index of the waypoint to remove", ArgTypes.integer());
     }
     
     @Override

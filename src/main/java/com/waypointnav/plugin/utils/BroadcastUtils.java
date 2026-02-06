@@ -32,6 +32,9 @@ public class BroadcastUtils {
                 World world = Universe.get().getWorld(worldUuid);
                 if (world != null) {
                     world.execute(() -> playerRef.sendMessage(Message.raw(message)));
+                } else {
+                    LOGGER.fine(String.format("Skipping broadcast for player %s — world not found for UUID %s",
+                        playerRef.getUuid(), worldUuid));
                 }
             }
         });

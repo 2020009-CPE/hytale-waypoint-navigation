@@ -16,12 +16,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Handles asynchronous saving and loading of waypoint data to/from JSON files.
  * Supports both per-player data and global shared waypoints.
  */
 public class WaypointStorage {
+    private static final Logger LOGGER = Logger.getLogger(WaypointStorage.class.getName());
     private final Path dataFolder;
     private final Path globalWaypointsFile;
     private final Gson gson;
@@ -253,7 +256,7 @@ public class WaypointStorage {
                 gson.toJson(waypoints, writer);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to save global waypoints", e);
         }
     }
 
@@ -295,7 +298,7 @@ public class WaypointStorage {
             return result;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to load global waypoints", e);
             return new ArrayList<>();
         }
     }

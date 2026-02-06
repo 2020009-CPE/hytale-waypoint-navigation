@@ -56,8 +56,8 @@ public class PlayerJoinListener {
                 LOGGER.info(String.format("No saved data found for player %s. Creating new profile.", playerUuid));
             }
             
-            // If global scope and player has no waypoints, sync global waypoints
-            if (isGlobalScope && playerData.getWaypoints().isEmpty()) {
+            // Sync global waypoints (merge any new ones the player doesn't have)
+            if (isGlobalScope) {
                 syncGlobalWaypoints(playerData);
             }
             
@@ -67,8 +67,9 @@ public class PlayerJoinListener {
     }
     
     /**
-     * Copies global waypoints to a player's waypoint list.
-     * Creates fresh copies so each player has independent completion tracking.
+     * Merges global waypoints into a player's waypoint list.
+     * Creates fresh copies for waypoints the player doesn't already have,
+     * preserving any individual completion progress on existing ones.
      *
      * @param playerData The player's waypoint data
      */
@@ -80,18 +81,30 @@ public class PlayerJoinListener {
             return;
         }
         
-        for (Waypoint globalWp : globalWaypoints) {
-            // Create a fresh copy for this player (independent completion tracking)
-            Waypoint copy = new Waypoint(globalWp.getName(),
-                globalWp.getX(), globalWp.getY(), globalWp.getZ(),
-                globalWp.getType());
-            copy.setCollectionRadius(globalWp.getCollectionRadius());
-            copy.setPriority(globalWp.getPriority());
-            copy.setWorld(globalWp.getWorld());
-            playerData.addWaypoint(copy);
+        // Build a set of existing waypoint names to avoid duplicates
+        java.util.Set<String> existingNames = new java.util.HashSet<>();
+        for (Waypoint existing : playerData.getWaypoints()) {
+            existingNames.add(existing.getName());
         }
         
-        LOGGER.info(String.format("Synced %d global waypoint(s) to player %s.",
-            globalWaypoints.size(), playerData.getPlayerUuid()));
+        int added = 0;
+        for (Waypoint globalWp : globalWaypoints) {
+            if (!existingNames.contains(globalWp.getName())) {
+                // Create a fresh copy for this player (independent completion tracking)
+                Waypoint copy = new Waypoint(globalWp.getName(),
+                    globalWp.getX(), globalWp.getY(), globalWp.getZ(),
+                    globalWp.getType());
+                copy.setCollectionRadius(globalWp.getCollectionRadius());
+                copy.setPriority(globalWp.getPriority());
+                copy.setWorld(globalWp.getWorld());
+                playerData.addWaypoint(copy);
+                added++;
+            }
+        }
+        
+        if (added > 0) {
+            LOGGER.info(String.format("Synced %d new global waypoint(s) to player %s (had %d already).",
+                added, playerData.getPlayerUuid(), existingNames.size()));
+        }
     }
 }

@@ -70,14 +70,6 @@ cd hytale-waypoint-navigation
 
 The compiled plugin will be in `build/libs/WaypointNavigation.jar`
 
-### Note on Hytale API
-Since the official Hytale API has not been released yet, this project includes stub classes for the Hytale API in `src/main/java/com/hypixel/hytale/`. These stubs allow the project to compile but do not provide actual functionality. When Hypixel releases the official API:
-1. Remove the stub classes: `rm -rf src/main/java/com/hypixel/hytale/`
-2. Uncomment the official dependency in `build.gradle.kts`
-3. Rebuild the project
-
-See `src/main/java/com/hypixel/hytale/README.md` for detailed migration instructions.
-
 ## Configuration
 
 The plugin creates a `config.json` file in `plugins/WaypointNavigation/`:
@@ -217,14 +209,7 @@ src/main/java/com/waypointnav/plugin/
 
 ## Development Notes
 
-This plugin is designed for the Hytale platform. Some features are marked with `TODO` comments where the Hytale API is not yet fully documented:
-
-- Event system integration
-- Particle system implementation
-- HUD rendering API
-- Command framework details
-
-These will be implemented as the official Hytale API becomes available.
+This plugin is built against the official Hytale modding API using the `hytale-mod` Gradle plugin. The Hytale API is provided at compile time by the plugin and available at runtime on the server.
 
 ## Contributing
 
@@ -259,5 +244,5 @@ For issues, questions, or suggestions:
 
 ## Acknowledgments
 
-Built using the Hytale Plugin Template structure for proper project organization and build configuration.
+Built using the official Hytale Plugin Template structure for proper project organization and build configuration.
 Hytale Pathfinder

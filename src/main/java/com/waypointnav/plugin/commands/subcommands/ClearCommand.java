@@ -1,20 +1,18 @@
 package com.waypointnav.plugin.commands.subcommands;
 
-import com.hypixel.hytale.command.AbstractPlayerCommand;
-import com.hypixel.hytale.command.CommandContext;
-import com.hypixel.hytale.entity.Player;
-import com.hypixel.hytale.entity.PlayerRef;
-import com.hypixel.hytale.message.Message;
-import com.hypixel.hytale.permission.GameMode;
-import com.hypixel.hytale.store.EntityStore;
-import com.hypixel.hytale.store.Ref;
-import com.hypixel.hytale.store.Store;
-import com.hypixel.hytale.world.World;
+import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
+import com.hypixel.hytale.server.core.command.system.CommandContext;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.permission.GameMode;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MessageUtils;
-
-import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
@@ -29,20 +27,19 @@ public class ClearCommand extends AbstractPlayerCommand {
     }
     
     @Override
-    protected void execute(@Nonnull CommandContext ctx,
-                         @Nonnull Store<EntityStore> store,
-                         @Nonnull Ref<EntityStore> ref,
-                         @Nonnull PlayerRef playerRef,
-                         @Nonnull World world) {
+    protected void execute(CommandContext ctx,
+                         Store<EntityStore> store,
+                         Ref<EntityStore> ref,
+                         PlayerRef playerRef,
+                         World world) {
         
         WaypointNavigationPlugin plugin = WaypointNavigationPlugin.getInstance();
-        Player player = store.getComponent(ref, Player.getComponentType());
-        UUID playerUuid = player.getUuid();
+        UUID playerUuid = playerRef.getUuid();
         
         PlayerWaypointData playerData = plugin.getPlayerDataManager().getPlayerData(playerUuid);
         
         if (playerData == null || playerData.getWaypoints().isEmpty()) {
-            player.sendMessage(Message.raw(MessageUtils.error("You have no waypoints to clear!")));
+            playerRef.sendMessage(Message.raw(MessageUtils.error("You have no waypoints to clear!")));
             return;
         }
         
@@ -52,6 +49,6 @@ public class ClearCommand extends AbstractPlayerCommand {
         // Save asynchronously
         plugin.getStorage().savePlayerDataAsync(playerData);
         
-        player.sendMessage(Message.raw(MessageUtils.success("Cleared " + count + " waypoint(s)!")));
+        playerRef.sendMessage(Message.raw(MessageUtils.success("Cleared " + count + " waypoint(s)!")));
     }
 }

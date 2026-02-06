@@ -1,12 +1,9 @@
 package com.waypointnav.plugin.listeners;
 
-import com.hypixel.hytale.entity.PlayerRef;
-import com.hypixel.hytale.event.EventHandler;
-import com.hypixel.hytale.event.player.PlayerDisconnectEvent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 
-import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
@@ -15,18 +12,16 @@ import java.util.UUID;
 public class PlayerQuitListener {
     private final WaypointNavigationPlugin plugin;
     
-    public PlayerQuitListener(@Nonnull WaypointNavigationPlugin plugin) {
+    public PlayerQuitListener(WaypointNavigationPlugin plugin) {
         this.plugin = plugin;
     }
     
     /**
-     * Called when a player quits the server.
+     * Called when a player is removed from the world.
      *
-     * @param event The player disconnect event
+     * @param playerRef The player reference
      */
-    @EventHandler
-    public void onPlayerDisconnect(@Nonnull PlayerDisconnectEvent event) {
-        PlayerRef playerRef = event.getPlayerRef();
+    public void onPlayerQuit(PlayerRef playerRef) {
         UUID playerUuid = playerRef.getUuid();
         
         // Get player data

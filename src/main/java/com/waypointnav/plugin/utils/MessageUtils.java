@@ -1,7 +1,4 @@
 package com.waypointnav.plugin.utils;
-
-import javax.annotation.Nonnull;
-
 /**
  * Utility class for creating formatted messages and chat output.
  */
@@ -22,8 +19,8 @@ public class MessageUtils {
      * @param message The error message
      * @return Formatted error message
      */
-    @Nonnull
-    public static String error(@Nonnull String message) {
+
+    public static String error(String message) {
         return PREFIX + ERROR + message + RESET;
     }
     
@@ -33,8 +30,8 @@ public class MessageUtils {
      * @param message The success message
      * @return Formatted success message
      */
-    @Nonnull
-    public static String success(@Nonnull String message) {
+
+    public static String success(String message) {
         return PREFIX + SUCCESS + message + RESET;
     }
     
@@ -44,8 +41,8 @@ public class MessageUtils {
      * @param message The info message
      * @return Formatted info message
      */
-    @Nonnull
-    public static String info(@Nonnull String message) {
+
+    public static String info(String message) {
         return PREFIX + INFO + message + RESET;
     }
     
@@ -55,8 +52,8 @@ public class MessageUtils {
      * @param message The warning message
      * @return Formatted warning message
      */
-    @Nonnull
-    public static String warning(@Nonnull String message) {
+
+    public static String warning(String message) {
         return PREFIX + WARNING + message + RESET;
     }
     
@@ -66,8 +63,8 @@ public class MessageUtils {
      * @param message The message
      * @return Formatted message
      */
-    @Nonnull
-    public static String plain(@Nonnull String message) {
+
+    public static String plain(String message) {
         return PREFIX + message;
     }
     
@@ -77,8 +74,8 @@ public class MessageUtils {
      * @param message The message
      * @return The message as-is
      */
-    @Nonnull
-    public static String raw(@Nonnull String message) {
+
+    public static String raw(String message) {
         return message;
     }
     
@@ -90,7 +87,7 @@ public class MessageUtils {
      * @param z Z coordinate
      * @return Formatted coordinates string
      */
-    @Nonnull
+
     public static String formatCoordinates(double x, double y, double z) {
         return String.format("§e%.1f§7, §e%.1f§7, §e%.1f", x, y, z);
     }
@@ -101,8 +98,8 @@ public class MessageUtils {
      * @param title The header title
      * @return Formatted header
      */
-    @Nonnull
-    public static String header(@Nonnull String title) {
+
+    public static String header(String title) {
         return HIGHLIGHT + "=== " + title + " ===" + RESET;
     }
     
@@ -113,8 +110,8 @@ public class MessageUtils {
      * @param content The item content
      * @return Formatted list item
      */
-    @Nonnull
-    public static String listItem(int index, @Nonnull String content) {
+
+    public static String listItem(int index, String content) {
         return INFO + (index + 1) + "§7. " + RESET + content;
     }
     
@@ -130,8 +127,8 @@ public class MessageUtils {
      * @param completed Whether the waypoint is completed
      * @return Formatted waypoint string
      */
-    @Nonnull
-    public static String formatWaypointList(int index, @Nonnull String name, 
+
+    public static String formatWaypointList(int index, String name, 
                                             double x, double y, double z, 
                                             double distance, boolean completed) {
         String status = completed ? SUCCESS + "✓" : WARNING + "○";

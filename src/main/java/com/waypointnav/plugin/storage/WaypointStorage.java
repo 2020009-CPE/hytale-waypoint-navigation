@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.waypoint.Waypoint;
 
-import javax.annotation.Nonnull;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -24,7 +23,7 @@ public class WaypointStorage {
     private final Path dataFolder;
     private final Gson gson;
     
-    public WaypointStorage(@Nonnull Path dataFolder) {
+    public WaypointStorage(Path dataFolder) {
         this.dataFolder = dataFolder.resolve("playerdata");
         this.gson = new GsonBuilder()
             .setPrettyPrinting()
@@ -48,8 +47,8 @@ public class WaypointStorage {
      * @param playerData The player data to save
      * @return CompletableFuture that completes when save is done
      */
-    @Nonnull
-    public CompletableFuture<Void> savePlayerDataAsync(@Nonnull PlayerWaypointData playerData) {
+
+    public CompletableFuture<Void> savePlayerDataAsync(PlayerWaypointData playerData) {
         return CompletableFuture.runAsync(() -> savePlayerData(playerData));
     }
     
@@ -58,7 +57,7 @@ public class WaypointStorage {
      *
      * @param playerData The player data to save
      */
-    private void savePlayerData(@Nonnull PlayerWaypointData playerData) {
+    private void savePlayerData(PlayerWaypointData playerData) {
         Path playerFile = dataFolder.resolve(playerData.getPlayerUuid().toString() + ".json");
         
         try {
@@ -86,8 +85,8 @@ public class WaypointStorage {
      * @param playerUuid The player's UUID
      * @return CompletableFuture containing the loaded player data, or null if not found
      */
-    @Nonnull
-    public CompletableFuture<PlayerWaypointData> loadPlayerDataAsync(@Nonnull UUID playerUuid) {
+
+    public CompletableFuture<PlayerWaypointData> loadPlayerDataAsync(UUID playerUuid) {
         return CompletableFuture.supplyAsync(() -> loadPlayerData(playerUuid));
     }
     
@@ -98,7 +97,7 @@ public class WaypointStorage {
      * @return The loaded player data, or null if not found
      */
     @SuppressWarnings("unchecked")
-    private PlayerWaypointData loadPlayerData(@Nonnull UUID playerUuid) {
+    private PlayerWaypointData loadPlayerData(UUID playerUuid) {
         Path playerFile = dataFolder.resolve(playerUuid.toString() + ".json");
         
         if (!Files.exists(playerFile)) {
@@ -177,7 +176,7 @@ public class WaypointStorage {
      * Deserializes a waypoint from a map.
      */
     @SuppressWarnings("unchecked")
-    private Waypoint deserializeWaypoint(@Nonnull Map<String, Object> map) {
+    private Waypoint deserializeWaypoint(Map<String, Object> map) {
         try {
             UUID id = UUID.fromString((String) map.get("id"));
             String name = (String) map.get("name");
@@ -214,7 +213,7 @@ public class WaypointStorage {
      * @param playerUuid The player's UUID
      * @return true if deleted successfully
      */
-    public boolean deletePlayerData(@Nonnull UUID playerUuid) {
+    public boolean deletePlayerData(UUID playerUuid) {
         Path playerFile = dataFolder.resolve(playerUuid.toString() + ".json");
         try {
             return Files.deleteIfExists(playerFile);

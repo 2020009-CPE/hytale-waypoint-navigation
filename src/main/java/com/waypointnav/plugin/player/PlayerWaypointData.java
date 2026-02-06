@@ -2,8 +2,6 @@ package com.waypointnav.plugin.player;
 
 import com.waypointnav.plugin.waypoint.Waypoint;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -26,7 +24,7 @@ public class PlayerWaypointData {
      *
      * @param playerUuid The player's UUID
      */
-    public PlayerWaypointData(@Nonnull UUID playerUuid) {
+    public PlayerWaypointData(UUID playerUuid) {
         this.playerUuid = playerUuid;
         this.waypoints = new ArrayList<>();
         this.completedWaypoints = new HashSet<>();
@@ -41,7 +39,7 @@ public class PlayerWaypointData {
      *
      * @return The player UUID
      */
-    @Nonnull
+
     public UUID getPlayerUuid() {
         return playerUuid;
     }
@@ -51,7 +49,7 @@ public class PlayerWaypointData {
      *
      * @return Unmodifiable list of waypoints
      */
-    @Nonnull
+
     public List<Waypoint> getWaypoints() {
         return Collections.unmodifiableList(waypoints);
     }
@@ -61,7 +59,7 @@ public class PlayerWaypointData {
      *
      * @param waypoint The waypoint to add
      */
-    public void addWaypoint(@Nonnull Waypoint waypoint) {
+    public void addWaypoint(Waypoint waypoint) {
         waypoint.setOrder(waypoints.size());
         waypoints.add(waypoint);
     }
@@ -72,7 +70,7 @@ public class PlayerWaypointData {
      * @param waypoint The waypoint to remove
      * @return true if removed successfully
      */
-    public boolean removeWaypoint(@Nonnull Waypoint waypoint) {
+    public boolean removeWaypoint(Waypoint waypoint) {
         boolean removed = waypoints.remove(waypoint);
         if (removed) {
             completedWaypoints.remove(waypoint.getId());
@@ -102,7 +100,7 @@ public class PlayerWaypointData {
      *
      * @return The active waypoint, or null if none
      */
-    @Nullable
+
     public Waypoint getActiveWaypoint() {
         if (waypoints.isEmpty() || activeWaypointIndex >= waypoints.size()) {
             return null;
@@ -148,7 +146,7 @@ public class PlayerWaypointData {
      *
      * @param waypointId The waypoint ID
      */
-    public void completeWaypoint(@Nonnull UUID waypointId) {
+    public void completeWaypoint(UUID waypointId) {
         completedWaypoints.add(waypointId);
         
         // Find and mark waypoint as completed
@@ -164,7 +162,7 @@ public class PlayerWaypointData {
      * @param waypointId The waypoint ID
      * @return true if completed
      */
-    public boolean isWaypointCompleted(@Nonnull UUID waypointId) {
+    public boolean isWaypointCompleted(UUID waypointId) {
         return completedWaypoints.contains(waypointId);
     }
     
@@ -173,7 +171,7 @@ public class PlayerWaypointData {
      *
      * @return Unmodifiable set of completed waypoint IDs
      */
-    @Nonnull
+
     public Set<UUID> getCompletedWaypoints() {
         return Collections.unmodifiableSet(completedWaypoints);
     }

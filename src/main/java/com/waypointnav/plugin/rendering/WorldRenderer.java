@@ -3,9 +3,6 @@ package com.waypointnav.plugin.rendering;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 import com.waypointnav.plugin.utils.MathUtils;
 import com.waypointnav.plugin.waypoint.Waypoint;
-
-import javax.annotation.Nonnull;
-
 /**
  * Handles rendering of world-space markers for waypoints.
  * Creates 3D particle effects and visual indicators in the game world.
@@ -25,7 +22,7 @@ public class WorldRenderer {
      * @param playerY Player's Y position
      * @param playerZ Player's Z position
      */
-    public void update(@Nonnull PlayerWaypointData playerData,
+    public void update(PlayerWaypointData playerData,
                       double playerX, double playerY, double playerZ) {
         
         tickCounter++;
@@ -54,7 +51,7 @@ public class WorldRenderer {
      * @param playerY Player's Y position
      * @param playerZ Player's Z position
      */
-    private void renderWaypointMarker(@Nonnull Waypoint waypoint,
+    private void renderWaypointMarker(Waypoint waypoint,
                                       double playerX, double playerY, double playerZ) {
         double distance = waypoint.distanceFrom(playerX, playerY, playerZ);
         
@@ -157,7 +154,7 @@ public class WorldRenderer {
      * @param z Z position
      * @param particleType Type of particle to spawn
      */
-    private void spawnParticle(double x, double y, double z, @Nonnull String particleType) {
+    private void spawnParticle(double x, double y, double z, String particleType) {
         // Use Hytale's particle system:
         // world.spawnParticle(particleType, x, y, z, count, offsetX, offsetY, offsetZ, speed);
     }
@@ -168,7 +165,7 @@ public class WorldRenderer {
      * @param distance Distance in blocks
      * @return Particle type name
      */
-    @Nonnull
+
     private String getParticleType(double distance) {
         if (distance < 50) {
             return "HAPPY_VILLAGER"; // Green

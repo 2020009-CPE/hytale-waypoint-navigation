@@ -1,12 +1,9 @@
 package com.waypointnav.plugin.listeners;
 
-import com.hypixel.hytale.entity.PlayerRef;
-import com.hypixel.hytale.event.EventHandler;
-import com.hypixel.hytale.event.player.PlayerReadyEvent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.waypointnav.plugin.WaypointNavigationPlugin;
 import com.waypointnav.plugin.player.PlayerWaypointData;
 
-import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
@@ -15,18 +12,16 @@ import java.util.UUID;
 public class PlayerJoinListener {
     private final WaypointNavigationPlugin plugin;
     
-    public PlayerJoinListener(@Nonnull WaypointNavigationPlugin plugin) {
+    public PlayerJoinListener(WaypointNavigationPlugin plugin) {
         this.plugin = plugin;
     }
     
     /**
-     * Called when a player joins the server.
+     * Called when a player is added to the world.
      *
-     * @param event The player ready event
+     * @param playerRef The player reference
      */
-    @EventHandler
-    public void onPlayerReady(@Nonnull PlayerReadyEvent event) {
-        PlayerRef playerRef = event.getPlayerRef();
+    public void onPlayerJoin(PlayerRef playerRef) {
         UUID playerUuid = playerRef.getUuid();
         
         // Load player data asynchronously

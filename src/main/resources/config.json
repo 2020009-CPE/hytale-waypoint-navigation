@@ -7,9 +7,9 @@
   },
   "world": {
     "enabled": true,
-    "particleType": "FLAME",
-    "particleCount": 20,
-    "updateInterval": 2
+    "beaconOverlay": true,
+    "markerIcon": "default",
+    "updateInterval": 10
   },
   "waypoint": {
     "defaultRadius": 5.0,
@@ -20,7 +20,7 @@
   "navigation": {
     "alwaysEnabled": true
   },
-  "playerScope": true,
+  "playerScope": false,
   "autoSave": {
     "enabled": true,
     "interval": 300

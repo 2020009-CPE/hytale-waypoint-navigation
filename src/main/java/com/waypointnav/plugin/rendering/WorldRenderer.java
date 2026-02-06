@@ -1,30 +1,39 @@
 package com.waypointnav.plugin.rendering;
 
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.waypointnav.plugin.player.PlayerWaypointData;
-import com.waypointnav.plugin.utils.MathUtils;
+import com.waypointnav.plugin.ui.WaypointBeaconPage;
 import com.waypointnav.plugin.waypoint.Waypoint;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+
 /**
  * Handles rendering of world-space markers for waypoints.
- * Creates 3D particle effects and visual indicators in the game world.
  *
- * Particles are rendered frequently and in high counts to ensure they are
- * clearly visible. A tall vertical beacon column marks the waypoint location,
- * and a dense particle trail guides players from their position toward it.
+ * Instead of using particles (which require an unavailable particle API),
+ * this renderer uses a UI-based beacon overlay ({@link WaypointBeaconPage})
+ * that displays a persistent on-screen indicator showing the active waypoint's
+ * name, direction, distance, and coordinates.
+ *
+ * The beacon overlay is automatically opened when a player has an active waypoint
+ * and closed when navigation is disabled or all waypoints are completed.
+ * It refreshes periodically to keep direction and distance up-to-date.
  */
 public class WorldRenderer {
     private static final Logger LOGGER = Logger.getLogger(WorldRenderer.class.getName());
     private int tickCounter = 0;
 
-    // Rendering constants — tuned for maximum visibility
-    private static final int BEACON_HEIGHT = 20;        // Tall vertical column (blocks)
-    private static final int BEACON_RING_POINTS = 16;   // Points per ring for circular base
-    private static final double BEACON_RADIUS = 1.5;    // Ring radius at base
-    private static final int TRAIL_MAX_PARTICLES = 20;  // Max particles in direction trail
-    private static final double TRAIL_SPACING = 1.5;    // Blocks between trail particles
-    private static final int RENDER_INTERVAL = 2;       // Ticks between updates (10 times/sec)
-    private static final double MAX_RENDER_DISTANCE = 500; // Max render distance in blocks
+    private static final int RENDER_INTERVAL = 10; // Ticks between beacon UI updates
+
+    /** Active beacon overlay pages per player UUID. */
+    private final Map<UUID, WaypointBeaconPage> activeBeacons = new ConcurrentHashMap<>();
 
     /**
      * Updates world markers for a player. Should be called every tick.
@@ -40,160 +49,93 @@ public class WorldRenderer {
         tickCounter++;
 
         if (!playerData.isWorldMarkersEnabled()) {
-            LOGGER.fine("[DEBUG] World markers disabled for player, skipping render.");
+            closeBeacon(playerData.getPlayerUuid());
             return;
         }
 
         Waypoint active = playerData.getActiveWaypoint();
         if (active == null) {
-            LOGGER.fine("[DEBUG] No active waypoint for player, skipping world marker render.");
+            closeBeacon(playerData.getPlayerUuid());
             return;
         }
 
-        // Render every RENDER_INTERVAL ticks (10 times/second for high visibility)
+        // Refresh the beacon overlay periodically
         if (tickCounter % RENDER_INTERVAL == 0) {
-            renderWaypointMarker(active, playerX, playerY, playerZ);
+            refreshBeacon(playerData.getPlayerUuid());
         }
     }
 
     /**
-     * Renders a marker for a waypoint in the world.
+     * Opens a beacon overlay for a player. Call this when a player has an active
+     * waypoint and the beacon should be shown.
      *
-     * @param waypoint The waypoint to mark
-     * @param playerX Player's X position
-     * @param playerY Player's Y position
-     * @param playerZ Player's Z position
+     * @param playerRef The player reference
+     * @param ref Entity reference
+     * @param store Entity store
      */
-    private void renderWaypointMarker(Waypoint waypoint,
-                                      double playerX, double playerY, double playerZ) {
-        double distance = waypoint.distanceFrom(playerX, playerY, playerZ);
+    public void openBeacon(PlayerRef playerRef, Ref<EntityStore> ref, Store<EntityStore> store) {
+        UUID playerUuid = playerRef.getUuid();
 
-        // Don't render if too far away (performance optimization)
-        if (distance > MAX_RENDER_DISTANCE) {
-            LOGGER.fine(String.format("[DEBUG] Waypoint '%s' is %.1f blocks away (>%.0f), skipping world marker.",
-                waypoint.getName(), distance, MAX_RENDER_DISTANCE));
+        if (activeBeacons.containsKey(playerUuid)) {
+            LOGGER.fine(String.format("[DEBUG] Beacon already open for player %s", playerUuid));
             return;
         }
 
-        LOGGER.fine(String.format("[DEBUG] Rendering world marker for waypoint '%s' at (%.1f, %.1f, %.1f), distance: %.1f",
-            waypoint.getName(), waypoint.getX(), waypoint.getY(), waypoint.getZ(), distance));
+        Player player = store.getComponent(ref, Player.getComponentType());
+        if (player == null) {
+            LOGGER.warning(String.format("Could not open beacon for player %s — Player component not found.", playerUuid));
+            return;
+        }
 
-        // Calculate direction vector from player eye level to waypoint
-        double[] direction = MathUtils.directionVector(
-            playerX, playerY + 1.6, playerZ,
-            waypoint.getX(), waypoint.getY(), waypoint.getZ()
-        );
+        WaypointBeaconPage beaconPage = new WaypointBeaconPage(playerRef);
+        player.getPageManager().openCustomPage(ref, store, beaconPage);
+        activeBeacons.put(playerUuid, beaconPage);
 
-        // 1) Dense particle trail from player toward waypoint
-        renderParticleTrail(
-            playerX, playerY + 1.6, playerZ,
-            direction[0], direction[1], direction[2],
-            distance
-        );
-
-        // 2) Tall beacon column at the waypoint location
-        renderBeaconColumn(waypoint.getX(), waypoint.getY(), waypoint.getZ(), distance);
-
-        // 3) Rotating ring at the base of the beacon
-        renderBeaconRing(waypoint.getX(), waypoint.getY(), waypoint.getZ());
+        LOGGER.info(String.format("Opened waypoint beacon overlay for player %s", playerUuid));
     }
 
     /**
-     * Renders a dense line of particles from the player toward the waypoint.
-     * Uses close spacing (1.5 blocks) and up to 20 particles for clear directionality.
-     */
-    private void renderParticleTrail(double startX, double startY, double startZ,
-                                     double dirX, double dirY, double dirZ,
-                                     double distance) {
-        int particleCount = Math.min(TRAIL_MAX_PARTICLES, (int)(distance / TRAIL_SPACING));
-
-        String particleType = getDistanceParticleType(distance);
-
-        for (int i = 1; i <= particleCount; i++) {
-            double step = i * TRAIL_SPACING;
-            double x = startX + dirX * step;
-            double y = startY + dirY * step;
-            double z = startZ + dirZ * step;
-
-            spawnParticle(x, y, z, particleType);
-            // Spawn a second offset particle for extra density
-            spawnParticle(x, y + 0.3, z, particleType);
-        }
-    }
-
-    /**
-     * Renders a tall vertical beacon column at the waypoint.
-     * The column is BEACON_HEIGHT blocks tall, using bright particles every 0.5 blocks
-     * so it is visible from far away.
-     */
-    private void renderBeaconColumn(double x, double y, double z, double distance) {
-        String columnType = getDistanceParticleType(distance);
-
-        for (int i = 0; i < BEACON_HEIGHT * 2; i++) {
-            double offsetY = i * 0.5;
-            spawnParticle(x, y + offsetY, z, columnType);
-        }
-
-        // Additional bright "END_ROD" particles along the column for glow effect
-        for (int i = 0; i < BEACON_HEIGHT; i++) {
-            spawnParticle(x, y + i, z, "END_ROD");
-        }
-    }
-
-    /**
-     * Renders a rotating ring of particles at the waypoint base for visibility.
-     */
-    private void renderBeaconRing(double x, double y, double z) {
-        double angle = (tickCounter * 15) % 360;
-        double radians = Math.toRadians(angle);
-
-        for (int i = 0; i < BEACON_RING_POINTS; i++) {
-            double offsetAngle = radians + (i * 2 * Math.PI / BEACON_RING_POINTS);
-            double offsetX = Math.cos(offsetAngle) * BEACON_RADIUS;
-            double offsetZ = Math.sin(offsetAngle) * BEACON_RADIUS;
-
-            spawnParticle(x + offsetX, y, z + offsetZ, "FLAME");
-            spawnParticle(x + offsetX, y + 0.5, z + offsetZ, "FLAME");
-        }
-    }
-
-    /**
-     * Spawns a particle at the specified location.
-     * Placeholder for Hytale particle API integration.
+     * Refreshes the beacon overlay for a player.
      *
-     * @param x X position
-     * @param y Y position
-     * @param z Z position
-     * @param particleType Type of particle to spawn
+     * @param playerUuid The player's UUID
      */
-    private void spawnParticle(double x, double y, double z, String particleType) {
-        // TODO: Use Hytale's particle system when API is available:
-        // world.spawnParticle(particleType, x, y, z, count, offsetX, offsetY, offsetZ, speed);
-        LOGGER.fine(String.format("[DEBUG] Particle spawn requested: type=%s at (%.2f, %.2f, %.2f) - awaiting Hytale particle API",
-            particleType, x, y, z));
-    }
-
-    /**
-     * Gets the particle type based on distance — distance-based color coding.
-     *
-     * @param distance Distance in blocks
-     * @return Particle type name
-     */
-    private String getDistanceParticleType(double distance) {
-        if (distance < 50) {
-            return "HAPPY_VILLAGER"; // Green — very close
-        } else if (distance < 200) {
-            return "FLAME"; // Orange/Yellow — medium
-        } else {
-            return "LAVA"; // Red — far
+    private void refreshBeacon(UUID playerUuid) {
+        WaypointBeaconPage beacon = activeBeacons.get(playerUuid);
+        if (beacon != null) {
+            beacon.refresh();
         }
     }
 
     /**
-     * Clears all world markers.
+     * Closes the beacon overlay for a player.
+     *
+     * @param playerUuid The player's UUID
+     */
+    public void closeBeacon(UUID playerUuid) {
+        WaypointBeaconPage beacon = activeBeacons.remove(playerUuid);
+        if (beacon != null) {
+            beacon.close();
+            LOGGER.info(String.format("Closed waypoint beacon overlay for player %s", playerUuid));
+        }
+    }
+
+    /**
+     * Checks if a player has an active beacon overlay.
+     *
+     * @param playerUuid The player's UUID
+     * @return true if the player has an active beacon
+     */
+    public boolean hasBeacon(UUID playerUuid) {
+        return activeBeacons.containsKey(playerUuid);
+    }
+
+    /**
+     * Clears all world markers and beacon overlays.
      */
     public void clear() {
-        LOGGER.fine("[DEBUG] Clearing all world markers, resetting tick counter.");
+        LOGGER.fine("[DEBUG] Clearing all world markers and beacon overlays.");
+        activeBeacons.values().forEach(WaypointBeaconPage::close);
+        activeBeacons.clear();
         tickCounter = 0;
     }
 }
